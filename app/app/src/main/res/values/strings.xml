@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Android Music Generator</string>
+    <string name="file_not_found">File not found</string>
+    <string name="ok">OK</string>
+    <string name="harmonix_name">Harmonix</string>
+    <string name="osc_listener_name">OSC Listener</string>
+    <string name="midi_import_name">Midi Import</string>
+    <string name="ga_generator_name">GA Generator</string>
+    <string name="description_osc">Send OSC messages to port 8000 with OSC address /foo/bar to change frequency. The messages must consist of one float to control frequency and two arbitrary integer values.</string>
+    <string name="osc_listener_amplitude_label">Amplitude</string>
+    <string name="ga_generator_rating_label">Rate this sequence</string>
+</resources>

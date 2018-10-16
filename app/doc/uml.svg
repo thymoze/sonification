@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg height="413" version="1.1" width="695" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="78" x="49" y="15"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="78" x="49" y="15"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="54" y="28">
+Instrument</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="78" x="49" y="38"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="78" x="49" y="59"/>
+<rect fill="#ffffff" height="69" stroke="#ffffff" stroke-width="1" width="112" x="569" y="23"/>
+<rect fill="none" height="69" stroke="#000000" stroke-width="1" width="112" x="569" y="23"/>
+<text font-family="Dialog" font-size="12" x="611" y="36">
+Note</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="112" x="569" y="46"/>
+<text font-family="Dialog" font-size="12" x="573" y="60">
+payload : String</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="112" x="569" y="70"/>
+<rect fill="#ffffff" height="152" stroke="#ffffff" stroke-width="1" width="249" x="257" y="15"/>
+<rect fill="none" height="152" stroke="#000000" stroke-width="1" width="249" x="257" y="15"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="349" y="28">
+Sequencer</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="249" x="257" y="38"/>
+<text font-family="Dialog" font-size="12" x="261" y="52">
+tempo : float</text>
+<text font-family="Dialog" font-size="12" x="261" y="68">
+sequence : List&lt;Instrument,Note&gt;</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="249" x="257" y="78"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="261" y="92">
+addInstrument(instrument : Instrument)</text>
+<text font-family="Dialog" font-size="12" font-style="italic" x="261" y="108">
+initializeInstruments()</text>
+<text font-family="Dialog" font-size="12" x="261" y="124">
+play()</text>
+<text font-family="Dialog" font-size="12" x="261" y="140">
+stop()</text>
+<text font-family="Dialog" font-size="12" x="261" y="156">
+pause()</text>
+<rect fill="#ffffff" height="85" stroke="#ffffff" stroke-width="1" width="131" x="25" y="239"/>
+<rect fill="none" height="85" stroke="#000000" stroke-width="1" width="131" x="25" y="239"/>
+<text font-family="Dialog" font-size="12" x="34" y="252">
+CsoundInstrument</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="131" x="25" y="262"/>
+<text font-family="Dialog" font-size="12" x="29" y="276">
+name : String</text>
+<text font-family="Dialog" font-size="12" x="29" y="292">
+csoundCode : String</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="131" x="25" y="302"/>
+<polyline fill="none" points="89,239 89,81" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="89,81 96,93 82,93" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="89,81 96,93 82,93" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="88" stroke="#ffffff" stroke-width="1" width="301" x="241" y="311"/>
+<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="301" x="241" y="311"/>
+<text font-family="Dialog" font-size="12" x="336" y="324">
+CsoundSequencer</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="301" x="241" y="334"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="301" x="241" y="356"/>
+<text font-family="Dialog" font-size="12" x="245" y="370">
+addInstrument(instrument : CsoundInstrument)</text>
+<text font-family="Dialog" font-size="12" x="245" y="386">
+initializeInstruments()</text>
+<polyline fill="none" points="257,47 126,47" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="257,47 247,52 237,47 247,42" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="257,47 247,52 237,47 247,42" stroke="#000000" stroke-width="1"/>
+<text font-family="Dialog" font-size="12" x="229" y="62">
+1</text>
+<text font-family="Dialog" font-size="12" x="138" y="62">
+1..n</text>
+<rect fill="#ffffff" height="69" stroke="#ffffff" stroke-width="1" width="208" x="289" y="207"/>
+<rect fill="none" height="69" stroke="#000000" stroke-width="1" width="208" x="289" y="207"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="352" y="220">
+OSCSeqencer</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="289" y="230"/>
+<text font-family="Dialog" font-size="12" x="293" y="244">
+OSCOutputPort : Integer</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="289" y="254"/>
+<polyline fill="none" points="409,207 409,166" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="409,166 416,178 402,178" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="409,166 416,178 402,178" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="400,311 400,275" stroke="#333399" stroke-width="1"/>
+<polygon fill="#ffffff" points="400,275 407,287 393,287" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="400,275 407,287 393,287" stroke="#333399" stroke-width="1"/>
+</svg>
