@@ -4,6 +4,7 @@
 * pw: hcmTherapeutisch2017
 
 ### PiZeroW (SSH)
+* name: zeroWair
 * user: pi
 * pw: sm@rtAirMobile2017
 
