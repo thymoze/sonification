@@ -16,7 +16,7 @@ filename=strftime("%Y%m%d%H%M%S")
 filename+="log.txt"
 
 
-################# Methodes to read every sensor ##########################
+################# Methods to read every sensor ##########################
 def read_SDS011():
 	return sds011.main()
 
@@ -111,10 +111,7 @@ def write_log():
 		data =  datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S") + ";"
 		for item in log_data:
 			data += str(item) + ";"
-		print "Log Data Format:"
-		print "time : SDS011_PM2.5; SDS011_PM10; SHT_Humidity; SHT_Temperature; MICS_CO; MICS_NO2; MICS_NH3; MICS_C3H8; MICS_C4H10; MICS_CH4; MICS_H2; MICS_C2h5OH; BMP_Pressure; BMP_Temperature"
-#		print log_data
-		print data
+		print json.dumps(json_data, indent=2)
 		write_to_log(data, filename)
 	else:
 		print "Error: Data not complete!"
