@@ -20,6 +20,14 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
 }
 
 dependencies {
@@ -28,6 +36,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     implementation "android.arch.persistence.room:runtime:1.1.1"
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.karumi:dexter:5.0.0'
