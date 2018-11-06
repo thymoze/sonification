@@ -4,6 +4,7 @@ import android.Manifest;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -11,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -27,12 +29,10 @@ import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.util.Arrays;
 import java.util.List;
 
 import mupro.hcm.sonification.database.AppDatabase;
@@ -40,7 +40,7 @@ import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.HomeFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "SonificationMain";
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -74,41 +74,63 @@ public class MainActivity extends AppCompatActivity  {
 
         switchFragment(new HomeFragment());
 
-        requestPermissions();
+        requestGPSSettings();
+
+        if (!permissionsAreGranted())
+            requestPermissions();
+    }
+
+    private boolean permissionsAreGranted() {
+        int[] permissions = {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION),
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION),
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE),
+                ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+        };
+
+        for (int perm : permissions) {
+            if (perm != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+
+        return true;
     }
 
     private void requestPermissions() {
-        Toast.makeText(getApplicationContext(), "Please give us the permissions <3", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Please give us the permissions <3", Toast.LENGTH_LONG).show();
+
+        Dexter.withActivity(MainActivity.this).withPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET
+        ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                // check if all permissions are granted
+                if (report.areAllPermissionsGranted()) {
+                    // All good
+                    Toast.makeText(getApplicationContext(), "Thanks man!", Toast.LENGTH_SHORT).show();
+                }
+
+                // check for permanent denial of any permission
+                if (report.isAnyPermissionPermanentlyDenied()) {
+                    openSettings();
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }).check();
+    }
+
+    private void requestGPSSettings() {
+        Toast.makeText(getApplicationContext(), "Please activate GPS", Toast.LENGTH_SHORT).show();
 
         Task<LocationSettingsResponse> task = createLocationSettingsTask();
-        task.addOnSuccessListener(this, locationSettingsResponse -> Dexter.withActivity(MainActivity.this)
-                .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_NETWORK_STATE,
-                        Manifest.permission.INTERNET
-                ).withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        // check if all permissions are granted
-                        if (report.areAllPermissionsGranted()) {
-                            // All good
-                            Toast.makeText(getApplicationContext(), "Thanks man!", Toast.LENGTH_SHORT).show();
-                        }
-
-                        // check for permanent denial of any permission
-                        if (report.isAnyPermissionPermanentlyDenied()) {
-                            openSettings();
-                        } else {
-                            requestPermissions();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).check());
+        task.addOnSuccessListener(this, locationSettingsResponse -> Toast.makeText(getApplicationContext(), "Thanks man!", Toast.LENGTH_SHORT).show());
 
         task.addOnFailureListener(this, e -> {
             if (e instanceof ResolvableApiException) {
