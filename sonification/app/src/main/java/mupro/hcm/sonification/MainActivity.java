@@ -33,6 +33,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
 import android.util.Log;
 import android.widget.EditText;
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private enum Navigation {
         HOME, CHARTS, MAP;
     }
+
     private HomeFragment homeFragment;
     private ChartsFragment chartsFragment;
     private MapFragment mapFragment;
@@ -72,19 +74,19 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
-                switch (item.getItemId()) {
-                    case R.id.navigation_home:
-                        switchFragment(Navigation.HOME);
-                        return true;
-                    case R.id.navigation_dashboard:
-                        switchFragment(Navigation.CHARTS);
-                        return true;
-                    case R.id.navigation_notifications:
-                        switchFragment(Navigation.MAP);
-                        return true;
-                }
-                return false;
-            };
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                switchFragment(Navigation.HOME);
+                return true;
+            case R.id.navigation_dashboard:
+                switchFragment(Navigation.CHARTS);
+                return true;
+            case R.id.navigation_notifications:
+                switchFragment(Navigation.MAP);
+                return true;
+        }
+        return false;
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,10 +168,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void createDatabase() {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "sonification").build();
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] msg = new byte[4096];
                 DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
-                try(DatagramSocket ds = new DatagramSocket(PORT)) {
+                try (DatagramSocket ds = new DatagramSocket(PORT)) {
                     while (running) {
                         ds.receive(dp);
 
