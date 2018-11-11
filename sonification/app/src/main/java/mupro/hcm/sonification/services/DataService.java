@@ -20,9 +20,9 @@ import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.helpers.FusedLocationProvider;
 import mupro.hcm.sonification.helpers.GPSCoordinates;
 import mupro.hcm.sonification.helpers.SensorDataHelper;
-import mupro.hcm.sonification.helpers.SingleShotLocationProvider;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -43,8 +43,8 @@ public class DataService extends Service {
         super.onCreate();
         jsonReceiver = new JsonReceiver();
         startForeground(FOREGROUND_ID, buildForegroundNotification());
-        startReceivingData();
         Log.i(TAG, "onCreate");
+        startReceivingData();
     }
 
     public void startReceivingData() {
@@ -96,7 +96,7 @@ public class DataService extends Service {
             try {
                 Log.i(TAG, dataAsString);
                 JSONObject data = new JSONObject(dataAsString);
-                SingleShotLocationProvider.requestSingleUpdate(DataService.this,
+                FusedLocationProvider.requestSingleUpdate(DataService.this,
                         location -> saveDataWithLocationToDatabase(data, location));
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage());

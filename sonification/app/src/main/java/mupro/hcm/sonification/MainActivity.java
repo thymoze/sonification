@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.Manifest;
 import android.arch.persistence.room.Room;
@@ -56,6 +57,7 @@ import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.HomeFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.helpers.FusedLocationProvider;
 import mupro.hcm.sonification.services.DataService;
 import mupro.hcm.sonification.services.UdpService;
 
@@ -99,11 +101,21 @@ public class MainActivity extends AppCompatActivity {
 
         switchFragment(Navigation.HOME);
 
-        requestGPSSettings();
+        checkAndStart();
+    }
+
+    private void checkAndStart() {
+        if(((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER) && permissionsAreGranted())
+            startDataService();
+
+        if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER))
+            requestGPSSettings();
 
         if (!permissionsAreGranted())
             requestPermissions();
+    }
 
+    private void startDataService() {
         final Intent intent = new Intent(this.getApplication(), DataService.class);
         this.getApplication().startService(intent);
         this.getApplication().startForegroundService(intent);
@@ -117,12 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
         };
 
-        for (int perm : permissions) {
-            if (perm != PackageManager.PERMISSION_GRANTED)
-                return false;
-        }
-
-        return true;
+        return Arrays.stream(permissions).noneMatch(perm -> perm != PackageManager.PERMISSION_GRANTED);
     }
 
     private void requestPermissions() {
@@ -138,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
                 if (report.areAllPermissionsGranted()) {
                     // All good
                     Toast.makeText(getApplicationContext(), "Thanks man!", Toast.LENGTH_SHORT).show();
+                    startDataService();
                 }
-
                 // check for permanent denial of any permission
                 if (report.isAnyPermissionPermanentlyDenied()) {
                     openSettings();
