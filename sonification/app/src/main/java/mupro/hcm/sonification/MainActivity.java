@@ -56,6 +56,7 @@ import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.HomeFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.services.DataService;
 import mupro.hcm.sonification.services.UdpService;
 
 public class MainActivity extends AppCompatActivity {
@@ -71,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private ChartsFragment chartsFragment;
     private MapFragment mapFragment;
-
-    private JsonReceiver jsonReceiver;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -105,12 +104,9 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionsAreGranted())
             requestPermissions();
 
-        jsonReceiver = new JsonReceiver();
-        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        registerReceiver(jsonReceiver, intentFilter);
-
-        Intent intent = new Intent(this.getApplication(), UdpService.class);
-        getApplicationContext().startService(intent);
+        final Intent intent = new Intent(this.getApplication(), DataService.class);
+        this.getApplication().startService(intent);
+        this.getApplication().startForegroundService(intent);
     }
 
     private boolean permissionsAreGranted() {
@@ -242,22 +238,6 @@ public class MainActivity extends AppCompatActivity {
             //if (json.has("..."))
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
-        }
-    }
-
-    class JsonReceiver extends BroadcastReceiver {
-
-        private static final String TAG = "JsonReceiver";
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String data = intent.getStringExtra("data");
-            try {
-                JSONObject json = new JSONObject(data);
-                updateCharts(json);
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
         }
     }
 }

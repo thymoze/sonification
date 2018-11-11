@@ -54,10 +54,11 @@ public class FusedLocationProviderService extends IntentService{
     @Override
     protected void onHandleIntent(Intent intent) {
         receiver = intent.getParcelableExtra("receiver");
-        doStuffWithLocation();
+        Log.d(TAG, "haha");
+        getAndReturnLocation();
     }
 
-    private void doStuffWithLocation() {
+    private void getAndReturnLocation() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mLocationRequest = setupLocationRequest();
 
@@ -68,7 +69,7 @@ public class FusedLocationProviderService extends IntentService{
                 }
                 for (Location location : locationResult.getLocations()) {
                     Log.i(TAG, "Lat: " + location.getLatitude() + " - Long: " + location.getLongitude());
-                    sendLocation(location);
+                    returnLocation(location);
                 }
             }
         };
@@ -79,7 +80,7 @@ public class FusedLocationProviderService extends IntentService{
         }
     }
 
-    private void sendLocation(Location location) {
+    private void returnLocation(Location location) {
         if (location != null) {
             Bundle bundle = new Bundle();
             bundle.putDouble("longitude", location.getLongitude());
