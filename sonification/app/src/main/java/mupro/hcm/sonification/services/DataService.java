@@ -9,11 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -24,7 +20,9 @@ import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.database.SensorDataHelper;
+import mupro.hcm.sonification.helpers.GPSCoordinates;
+import mupro.hcm.sonification.helpers.SensorDataHelper;
+import mupro.hcm.sonification.helpers.SingleShotLocationProvider;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -38,20 +36,14 @@ public class DataService extends Service {
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
 
-    private double longitude = 0;
-    private double latitude = 0;
-    private JSONObject data = new JSONObject();
-
-    private LocationDataReceiver locationDataReceiver;
     private JsonReceiver jsonReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        locationDataReceiver = new LocationDataReceiver(new Handler());
         jsonReceiver = new JsonReceiver();
         startForeground(FOREGROUND_ID, buildForegroundNotification());
-        getCurrentPosition();
+        startReceivingData();
         Log.i(TAG, "onCreate");
     }
 
@@ -62,14 +54,8 @@ public class DataService extends Service {
         startService(intent);
     }
 
-    private void getCurrentPosition() {
-        Intent intent = new Intent(DataService.this, FusedLocationProviderService.class);
-        intent.putExtra("receiver", locationDataReceiver);
-        startService(intent);
-    }
-
-    private void saveToDatabase() {
-        SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(longitude, latitude, data);
+    private void saveDataWithLocationToDatabase(JSONObject data, GPSCoordinates location) {
+        SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(location, data);
         if (sensorData != null)
             AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insertAll(sensorData);
     }
@@ -109,65 +95,17 @@ public class DataService extends Service {
             String dataAsString = intent.getStringExtra("data");
             try {
                 Log.i(TAG, dataAsString);
-                setData(new JSONObject(dataAsString));
-                getCurrentPosition();
+                JSONObject data = new JSONObject(dataAsString);
+                SingleShotLocationProvider.requestSingleUpdate(DataService.this,
+                        location -> saveDataWithLocationToDatabase(data, location));
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage());
             }
         }
     }
 
-    private class LocationDataReceiver extends ResultReceiver {
-
-        private static final String TAG = "LocationReceiver";
-
-        public LocationDataReceiver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            switch (resultCode) {
-                case FusedLocationProviderService.LOCATION_ERROR:
-                    break;
-
-                case FusedLocationProviderService.LOCATION_SUCCESS:
-                    setLongitude(resultData.getDouble("longitude"));
-                    setLatitude(resultData.getDouble("latitude"));
-                    Log.i(TAG, "Long: " + longitude + "; Lat: " + latitude);
-                    saveToDatabase();
-                    break;
-            }
-            super.onReceiveResult(resultCode, resultData);
-        }
-    }
-
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public JSONObject getData() {
-        return data;
-    }
-
-    public void setData(JSONObject data) {
-        this.data = data;
     }
 }
 

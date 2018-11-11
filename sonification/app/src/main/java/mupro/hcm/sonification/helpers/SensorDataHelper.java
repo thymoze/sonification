@@ -1,27 +1,27 @@
-package mupro.hcm.sonification.database;
+package mupro.hcm.sonification.helpers;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Calendar;
+
+
+import mupro.hcm.sonification.database.SensorData;
 
 public class SensorDataHelper {
 
     private static final String TAG = "SensorDataHelper";
 
-    public static SensorData createSensorDataObjectFromValues(double longitude, double latitude, JSONObject data) {
+    public static SensorData createSensorDataObjectFromValues(GPSCoordinates location, JSONObject data) {
         SensorData sensorData = new SensorData();
 
         // create timestamp
         sensorData.setTimestamp(Instant.now().toString());
 
         // set gps data
-        sensorData.setLongitude(longitude);
-        sensorData.setLatitude(latitude);
+        sensorData.setLongitude(location.longitude);
+        sensorData.setLatitude(location.latitude);
 
         // get all sensor values
         try {

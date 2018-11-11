@@ -29,9 +29,6 @@
             android:name=".services.DataService"
             android:enabled="true" />
         <service
-            android:name=".services.FusedLocationProviderService"
-            android:enabled="true" />
-        <service
             android:name=".services.UdpService"
             android:exported="false" />
     </application>
