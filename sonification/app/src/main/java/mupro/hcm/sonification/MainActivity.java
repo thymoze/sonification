@@ -1,6 +1,9 @@
 package mupro.hcm.sonification;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.Manifest;
 import android.arch.persistence.room.Room;
@@ -53,24 +56,23 @@ import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.HomeFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.services.UdpService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PORT = 7777;
-
-    private static AsyncTask<Void, JSONObject, Void> server;
-    private boolean running = false;
-
     private enum Navigation {
-        HOME, CHARTS, MAP;
+        HOME, CHARTS, MAP
     }
+
+    private final String TAG = "SonificationMain";
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    public static final String BROADCAST_ACTION = "mupro.hcm.sonification.broadcast_action";
 
     private HomeFragment homeFragment;
     private ChartsFragment chartsFragment;
     private MapFragment mapFragment;
 
-    private final String TAG = "SonificationMain";
-    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private JsonReceiver jsonReceiver;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -103,8 +105,12 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionsAreGranted())
             requestPermissions();
 
-        running = true;
-        runServer();
+        jsonReceiver = new JsonReceiver();
+        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
+        registerReceiver(jsonReceiver, intentFilter);
+
+        Intent intent = new Intent(this.getApplication(), UdpService.class);
+        getApplicationContext().startService(intent);
     }
 
     private boolean permissionsAreGranted() {
@@ -169,64 +175,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        running = false;
-        server.cancel(true);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private void runServer() {
-        server = new AsyncTask<Void, JSONObject, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                byte[] msg = new byte[4096];
-                DatagramPacket dp = new DatagramPacket(msg, msg.length);
-
-                try (DatagramSocket ds = new DatagramSocket(PORT)) {
-                    while (running) {
-                        ds.receive(dp);
-
-                        try {
-                            publishProgress(new JSONObject(new String(msg, 0, dp.getLength())));
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(JSONObject... values) {
-                try {
-                    for (JSONObject json : values) {
-                        if (json.has("F25")) {
-                            LineChart chart = findViewById(R.id.chart_part25);
-                            if (chartsFragment != null && chart != null) {
-                                chartsFragment.addEntryToChart(chart, ((Double) json.get("F25")).floatValue());
-                            }
-                        }
-                        if (json.has("F10")) {
-                            LineChart chart = findViewById(R.id.chart_part10);
-                            if (chartsFragment != null && chart != null) {
-                                chartsFragment.addEntryToChart(chart, ((Double) json.get("F10")).floatValue());
-                            }
-                        }
-                        //and all the other gases
-                        //if (json.has("..."))
-                    }
-                } catch (JSONException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            }
-        };
-        server.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void switchFragment(Navigation navigation) {
@@ -271,5 +222,42 @@ public class MainActivity extends AppCompatActivity {
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void updateCharts(JSONObject json) {
+        try {
+            if (json.has("F25")) {
+                LineChart chart = findViewById(R.id.chart_part25);
+                if (chartsFragment != null && chart != null) {
+                    chartsFragment.addEntryToChart(chart, ((Double) json.get("F25")).floatValue());
+                }
+            }
+            if (json.has("F10")) {
+                LineChart chart = findViewById(R.id.chart_part10);
+                if (chartsFragment != null && chart != null) {
+                    chartsFragment.addEntryToChart(chart, ((Double) json.get("F10")).floatValue());
+                }
+            }
+            //and all the other gases
+            //if (json.has("..."))
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    class JsonReceiver extends BroadcastReceiver {
+
+        private static final String TAG = "JsonReceiver";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String data = intent.getStringExtra("data");
+            try {
+                JSONObject json = new JSONObject(data);
+                updateCharts(json);
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
     }
 }
