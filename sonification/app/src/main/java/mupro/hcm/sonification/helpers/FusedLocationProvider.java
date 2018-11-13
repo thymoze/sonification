@@ -32,6 +32,8 @@ public class FusedLocationProvider {
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setNumUpdates(1);
+        mLocationRequest.setInterval(500);
+        mLocationRequest.setFastestInterval(250);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationCallback mLocationCallback = new LocationCallback() {

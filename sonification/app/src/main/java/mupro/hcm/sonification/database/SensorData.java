@@ -7,7 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class SensorData {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "pm10")

@@ -17,7 +17,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "sonification").build();
+                            AppDatabase.class, "sonification").allowMainThreadQueries().build();
 
                 }
             }

@@ -20,26 +20,28 @@ public class SensorDataHelper {
         sensorData.setTimestamp(Instant.now().toString());
 
         // set gps data
-        sensorData.setLongitude(location.longitude);
-        sensorData.setLatitude(location.latitude);
+        if (location != null) {
+            sensorData.setLongitude(location.longitude);
+            sensorData.setLatitude(location.latitude);
+        }
 
         // get all sensor values
         try {
-            sensorData.setPm25(((Double) data.get("SDS011_PM2.5")).floatValue());
-            sensorData.setPm10(((Double) data.get("SDS011_PM10")).floatValue());
-            sensorData.setHumidity(((Double) data.get("SHT_Humidity")).floatValue());
-            sensorData.setTemperatureSHT(((Double) data.get("SHT_Temperature")).floatValue());
-            sensorData.setPressure(((Double) data.get("BPM_Pressure")).floatValue());
-            sensorData.setTemperatureBMP(((Double) data.get("BMP_Temperature")).floatValue());
+            sensorData.setPm25(((Double) data.get("SDS011_PM2.5")));
+            sensorData.setPm10(((Double) data.get("SDS011_PM10")));
+            sensorData.setHumidity(((Double) data.get("SHT_Humidity")));
+            sensorData.setTemperatureSHT(((Double) data.get("SHT_Temperature")));
+            sensorData.setPressure(((Double) data.get("BMP_Pressure")));
+            sensorData.setTemperatureBMP(((Double) data.get("BMP_Temperature")));
 
-            sensorData.setCo(((Double) data.get("MICS_CO")).floatValue());
-            sensorData.setNo2(((Double) data.get("MICS_NO2")).floatValue());
-            sensorData.setNh3(((Double) data.get("MICS_NH3")).floatValue());
-            sensorData.setC3h8(((Double) data.get("MICS_C3H8")).floatValue());
-            sensorData.setC4h10(((Double) data.get("MICS_C4H10")).floatValue());
-            sensorData.setCh4(((Double) data.get("MICS_CH4")).floatValue());
-            sensorData.setH2(((Double) data.get("MICS_H2")).floatValue());
-            sensorData.setC2h5oh(((Double) data.get("MICS_C2h5OH")).floatValue());
+            sensorData.setCo(((Double) data.get("MICS_CO")));
+            sensorData.setNo2(((Double) data.get("MICS_NO2")));
+            sensorData.setNh3(((Double) data.get("MICS_NH3")));
+            sensorData.setC3h8(((Double) data.get("MICS_C3H8")));
+            sensorData.setC4h10(((Double) data.get("MICS_C4H10")));
+            sensorData.setCh4(((Double) data.get("MICS_CH4")));
+            sensorData.setH2(((Double) data.get("MICS_H2")));
+            sensorData.setC2h5oh(((Double) data.get("MICS_C2H5OH")));
         } catch (JSONException ex) {
             Log.e(TAG, ex.getMessage());
         }
