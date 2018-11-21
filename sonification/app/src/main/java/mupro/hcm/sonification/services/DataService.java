@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,6 +97,9 @@ public class DataService extends Service {
             try {
                 Log.i(TAG, dataAsString);
                 JSONObject data = new JSONObject(dataAsString);
+
+                Toast.makeText(getApplicationContext(), data.toString(), Toast.LENGTH_LONG).show();
+
                 FusedLocationProvider.requestSingleUpdate(DataService.this,
                         location -> saveDataWithLocationToDatabase(data, location));
             } catch (JSONException e) {
