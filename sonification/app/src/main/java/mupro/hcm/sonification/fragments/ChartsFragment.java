@@ -3,6 +3,7 @@ package mupro.hcm.sonification.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -26,6 +27,9 @@ import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -34,8 +38,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import mupro.hcm.sonification.R;
+import mupro.hcm.sonification.database.AppDatabase;
+import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.helpers.JsonReceiver;
+
+import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
 public class ChartsFragment extends Fragment {
+
+    private static String TAG = "ChartsFragment";
 
     @BindView(R.id.chart_part10)
     LineChart chartPart10;
@@ -113,7 +124,26 @@ public class ChartsFragment extends Fragment {
         initChart(chartPart25);
         initChart(chartPart10);
 
+        JsonReceiver jsonReceiver = new JsonReceiver(this::updateCharts);
+        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
+        getContext().registerReceiver(jsonReceiver, intentFilter);
+
         return view;
+    }
+
+    private Void updateCharts(JSONObject json) {
+        try {
+            if (json.has("SDS011_PM2.5"))
+                addEntryToChart(chartPart25, ((Double) json.get("SDS011_PM2.5")).floatValue());
+            if (json.has("SDS011_PM10")) {
+                addEntryToChart(chartPart10, ((Double) json.get("SDS011_PM10")).floatValue());
+            }
+            //and all the other gases
+            //if (json.has("..."))
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return null;
     }
 
     private void initChart(LineChart chart) {

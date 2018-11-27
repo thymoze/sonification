@@ -41,6 +41,7 @@ public class UdpService extends IntentService {
         DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
         try (DatagramSocket ds = new DatagramSocket(PORT)) {
+            Log.i(TAG, "Listening on port " + PORT);
             while (running) {
                 ds.receive(dp);
                 Log.i(TAG, "Received object.");

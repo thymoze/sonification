@@ -226,25 +226,4 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
-
-    private void updateCharts(JSONObject json) {
-        try {
-            if (json.has("F25")) {
-                LineChart chart = findViewById(R.id.chart_part25);
-                if (chartsFragment != null && chart != null) {
-                    chartsFragment.addEntryToChart(chart, ((Double) json.get("F25")).floatValue());
-                }
-            }
-            if (json.has("F10")) {
-                LineChart chart = findViewById(R.id.chart_part10);
-                if (chartsFragment != null && chart != null) {
-                    chartsFragment.addEntryToChart(chart, ((Double) json.get("F10")).floatValue());
-                }
-            }
-            //and all the other gases
-            //if (json.has("..."))
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
 }

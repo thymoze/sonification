@@ -23,6 +23,7 @@ import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.FusedLocationProvider;
 import mupro.hcm.sonification.helpers.GPSCoordinates;
+import mupro.hcm.sonification.helpers.JsonReceiver;
 import mupro.hcm.sonification.helpers.SensorDataHelper;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
@@ -42,7 +43,18 @@ public class DataService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        jsonReceiver = new JsonReceiver();
+        jsonReceiver = new JsonReceiver(data -> {
+            try {
+                Toast.makeText(getApplicationContext(), data.toString(2), Toast.LENGTH_LONG).show();
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            FusedLocationProvider.requestSingleUpdate(DataService.this,
+                    location -> saveDataWithLocationToDatabase(data, location));
+
+            return null;
+        });
         startForeground(FOREGROUND_ID, buildForegroundNotification());
         Log.i(TAG, "onCreate");
         startReceivingData();
@@ -85,27 +97,6 @@ public class DataService extends Service {
         notificationManager.notify(FOREGROUND_ID, mBuilder.build());
 
         return (mBuilder.build());
-    }
-
-    private class JsonReceiver extends BroadcastReceiver {
-
-        private static final String TAG = "JsonReceiver";
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String dataAsString = intent.getStringExtra("data");
-            try {
-                Log.i(TAG, dataAsString);
-                JSONObject data = new JSONObject(dataAsString);
-
-                Toast.makeText(getApplicationContext(), data.toString(), Toast.LENGTH_LONG).show();
-
-                FusedLocationProvider.requestSingleUpdate(DataService.this,
-                        location -> saveDataWithLocationToDatabase(data, location));
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
-        }
     }
 
     public IBinder onBind(Intent intent) {
