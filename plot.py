@@ -1,6 +1,4 @@
-import json
 import sys
-from scipy.interpolate import make_interp_spline, BSpline
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
