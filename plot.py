@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,12 +26,17 @@ keywords = {
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] in ['-h', '--help', '-?']:
         print('''USAGE: 
-        python plot.py PATH_TO_DATA_FILE.csv\n''')
+        python plot.py PATH_TO_CSV.csv
+        python plot.py PATH_TO_DATABASE.db
+        ''')
         exit(1)
 
-    df = None
-    with open(sys.argv[1], 'r') as file:
-        df = pd.read_csv(file, parse_dates=['timestamp'])
+    if sys.argv[1].endswith('.csv'):
+        with open(sys.argv[1], 'r') as file:
+            df = pd.read_csv(file, parse_dates=['timestamp'])
+    else:
+        con = sqlite3.connect(sys.argv[1])
+        df = pd.read_sql("SELECT * FROM SensorData", con, parse_dates=['timestamp'])
 
     # convert timestamp to int so we can do calculations with it
     x = np.int64(df['timestamp'])
