@@ -1,21 +1,12 @@
 package mupro.hcm.sonification.fragments;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -23,24 +14,13 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import mupro.hcm.sonification.R;
-import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.JsonReceiver;
+import mupro.hcm.sonification.helpers.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -124,25 +104,21 @@ public class ChartsFragment extends Fragment {
         initChart(chartPart25);
         initChart(chartPart10);
 
-        JsonReceiver jsonReceiver = new JsonReceiver(this::updateCharts);
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::updateCharts);
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        getContext().registerReceiver(jsonReceiver, intentFilter);
+        getContext().registerReceiver(sensorDataReceiver, intentFilter);
 
         return view;
     }
 
-    private Void updateCharts(JSONObject json) {
-        try {
-            if (json.has("SDS011_PM2.5"))
-                addEntryToChart(chartPart25, ((Double) json.get("SDS011_PM2.5")).floatValue());
-            if (json.has("SDS011_PM10")) {
-                addEntryToChart(chartPart10, ((Double) json.get("SDS011_PM10")).floatValue());
-            }
-            //and all the other gases
-            //if (json.has("..."))
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
+    private Void updateCharts(SensorData data) {
+        if (data.getPm25() != 0)
+            addEntryToChart(chartPart25, ((Double) data.getPm25()).floatValue());
+        if (data.getPm10() != 0)
+            addEntryToChart(chartPart25, ((Double) data.getPm10()).floatValue());
+        //and all the other gases
+        //if (json.has("..."))
+
         return null;
     }
 

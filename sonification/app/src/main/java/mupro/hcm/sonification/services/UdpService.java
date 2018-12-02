@@ -4,11 +4,19 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.time.Instant;
 
 import mupro.hcm.sonification.MainActivity;
+import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.helpers.FusedLocationProvider;
+import mupro.hcm.sonification.helpers.SensorDataHelper;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -30,13 +38,13 @@ public class UdpService extends IntentService {
         if (!running) {
             Log.i(TAG, "Starting UdpService.");
             running = true;
-            runServer();
+            runServer(intent);
         } else {
             running = false;
         }
     }
 
-    private void runServer() {
+    private void runServer(Intent intent) {
         byte[] msg = new byte[4096];
         DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
@@ -46,11 +54,24 @@ public class UdpService extends IntentService {
                 ds.receive(dp);
                 Log.i(TAG, "Received object.");
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
-                broadcastIntent.putExtra("data", new String(msg, 0, dp.getLength()));
+                // add location
+                FusedLocationProvider.requestSingleUpdate(UdpService.this, (location -> {
+                    Log.i(TAG, "Got Location");
 
-                sendBroadcast(broadcastIntent);
+                    try {
+                        JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
+                        SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(location, data);
+                        sensorData.setTimestamp(Instant.now().toString());
+
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
+                        broadcastIntent.putExtra("data", sensorData);
+
+                        sendBroadcast(broadcastIntent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }));
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());

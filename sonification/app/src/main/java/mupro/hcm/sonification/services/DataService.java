@@ -5,8 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
@@ -14,17 +12,11 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
-import mupro.hcm.sonification.helpers.GPSCoordinates;
-import mupro.hcm.sonification.helpers.JsonReceiver;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
+import mupro.hcm.sonification.helpers.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -38,20 +30,15 @@ public class DataService extends Service {
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
 
-    private JsonReceiver jsonReceiver;
+    private SensorDataReceiver sensorDataReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        jsonReceiver = new JsonReceiver(data -> {
-            try {
-                Toast.makeText(getApplicationContext(), data.toString(2), Toast.LENGTH_LONG).show();
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
+        sensorDataReceiver = new SensorDataReceiver(data -> {
+            Toast.makeText(getApplicationContext(), data.getTimestamp(), Toast.LENGTH_LONG).show();
 
-            FusedLocationProvider.requestSingleUpdate(DataService.this,
-                    location -> saveDataWithLocationToDatabase(data, location));
+            saveDataToDatabase(data);
 
             return null;
         });
@@ -62,13 +49,12 @@ public class DataService extends Service {
 
     public void startReceivingData() {
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        registerReceiver(jsonReceiver, intentFilter);
+        registerReceiver(sensorDataReceiver, intentFilter);
         Intent intent = new Intent(DataService.this, UdpService.class);
         startService(intent);
     }
 
-    private void saveDataWithLocationToDatabase(JSONObject data, GPSCoordinates location) {
-        SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(location, data);
+    private void saveDataToDatabase(SensorData sensorData) {
         if (sensorData != null)
             AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insertAll(sensorData);
     }

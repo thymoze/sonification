@@ -16,9 +16,6 @@ public class SensorDataHelper {
     public static SensorData createSensorDataObjectFromValues(GPSCoordinates location, JSONObject data) {
         SensorData sensorData = new SensorData();
 
-        // create timestamp
-        sensorData.setTimestamp(Instant.now().toString());
-
         // set gps data
         if (location != null) {
             sensorData.setLongitude(location.longitude);

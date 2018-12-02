@@ -2,7 +2,6 @@ package mupro.hcm.sonification.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,17 +18,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.Polyline;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.FusedLocationProvider;
-import mupro.hcm.sonification.helpers.GPSCoordinates;
-import mupro.hcm.sonification.helpers.JsonReceiver;
+import mupro.hcm.sonification.helpers.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -72,9 +65,9 @@ public class MapFragment extends Fragment implements
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mSupportMapFragment.getMapAsync(this);
 
-        JsonReceiver jsonReceiver = new JsonReceiver(this::updateMap);
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::updateMap);
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        getContext().registerReceiver(jsonReceiver, intentFilter);
+        getContext().registerReceiver(sensorDataReceiver, intentFilter);
 
         return v;
     }
@@ -126,7 +119,10 @@ public class MapFragment extends Fragment implements
 
     }
 
-    private Void updateMap(JSONObject json) {
+    private Void updateMap(SensorData data) {
+        addMarker(data);
+        Log.i(TAG, "Marker added for " + data.getTimestamp());
+
         return null;
     }
 }
