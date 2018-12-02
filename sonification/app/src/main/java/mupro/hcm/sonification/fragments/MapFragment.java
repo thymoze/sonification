@@ -102,6 +102,8 @@ public class MapFragment extends Fragment implements
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
 
         Log.i(TAG, "Marker added for " + data.getTimestamp());
+        
+        return null;
     }
 
     @Override
