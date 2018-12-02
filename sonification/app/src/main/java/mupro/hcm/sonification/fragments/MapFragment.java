@@ -92,7 +92,7 @@ public class MapFragment extends Fragment implements
     private Void addMarker(SensorData data) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(data.getLatitude(), data.getLongitude()))
-                .title(data.getTimestamp()));
+                .title(data.getTimestamp().toString()));
         marker.setTag(data);
 
         CameraPosition position = new CameraPosition.Builder()
@@ -102,7 +102,6 @@ public class MapFragment extends Fragment implements
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
 
         Log.i(TAG, "Marker added for " + data.getTimestamp());
-        
         return null;
     }
 

@@ -1,16 +1,11 @@
 package mupro.hcm.sonification;
 
-import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.IntentFilter;
-import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.Manifest;
-import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -22,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -38,68 +32,36 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
-import android.util.Log;
-import android.widget.EditText;
-
-import com.github.mikephil.charting.charts.LineChart;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import mupro.hcm.sonification.database.AppDatabase;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.HomeFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
 import mupro.hcm.sonification.services.DataService;
-import mupro.hcm.sonification.services.UdpService;
 
-public class MainActivity extends AppCompatActivity {
-
-    private enum Navigation {
-        HOME, CHARTS, MAP
-    }
+public class MainActivity extends AppCompatActivity
+        implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private final String TAG = "SonificationMain";
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     public static final String BROADCAST_ACTION = "mupro.hcm.sonification.broadcast_action";
 
-    private HomeFragment homeFragment;
-    private ChartsFragment chartsFragment;
-    private MapFragment mapFragment;
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = item -> {
-        switch (item.getItemId()) {
-            case R.id.navigation_home:
-                switchFragment(Navigation.HOME);
-                return true;
-            case R.id.navigation_dashboard:
-                switchFragment(Navigation.CHARTS);
-                return true;
-            case R.id.navigation_notifications:
-                switchFragment(Navigation.MAP);
-                return true;
-        }
-        return false;
-    };
+    @BindView(R.id.navigation)
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
-        switchFragment(Navigation.HOME);
+        switchFragment(HomeFragment.newInstance());
 
         checkAndStart();
     }
@@ -183,27 +145,23 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void switchFragment(Navigation navigation) {
-        Fragment fragment;
-        switch (navigation) {
-            case CHARTS:
-                if (chartsFragment == null)
-                    chartsFragment = ChartsFragment.newInstance();
-                fragment = chartsFragment;
-                break;
-            case MAP:
-                if (mapFragment == null)
-                    mapFragment = MapFragment.newInstance();
-                fragment = mapFragment;
-                break;
-            case HOME:
-            default:
-                if (homeFragment == null)
-                    homeFragment = HomeFragment.newInstance();
-                fragment = homeFragment;
-                break;
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                switchFragment(HomeFragment.newInstance());
+                return true;
+            case R.id.navigation_dashboard:
+                switchFragment(ChartsFragment.newInstance());
+                return true;
+            case R.id.navigation_notifications:
+                switchFragment(MapFragment.newInstance());
+                return true;
         }
+        return false;
+    }
 
+    private void switchFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);

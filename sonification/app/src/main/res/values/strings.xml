@@ -3,4 +3,19 @@
     <string name="title_home">Home</string>
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
+
+    <!-- Charts -->
+    <string name="pm25">Feinstaub 2.5</string>
+    <string name="pm10">Feinstaub 10</string>
+    <string name="co">Kohlenmonoxid</string>
+    <string name="nh3">Ammoniak</string>
+    <string name="no2">Stickstoffdioxid</string>
+    <string name="ethanol">Ethanol</string>
+    <string name="h2">Wasserstoff</string>
+    <string name="ch4">Methan</string>
+    <string name="propan">Propan</string>
+    <string name="isobutan">Isobutan</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

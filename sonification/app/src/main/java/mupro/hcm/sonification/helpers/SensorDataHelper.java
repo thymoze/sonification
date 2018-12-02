@@ -1,26 +1,52 @@
 package mupro.hcm.sonification.helpers;
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Optional;
 
 
+import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 
 public class SensorDataHelper {
 
     private static final String TAG = "SensorDataHelper";
 
-    public static SensorData createSensorDataObjectFromValues(GPSCoordinates location, JSONObject data) {
-        SensorData sensorData = new SensorData();
-
-        // set gps data
-        if (location != null) {
-            sensorData.setLongitude(location.longitude);
-            sensorData.setLatitude(location.latitude);
+    public enum Sensors {
+        PM25("pm25"),
+        PM10("pm10"),
+        ;
+        private String id;
+        Sensors(String id) {
+            this.id = id;
         }
+
+        public String getId() {
+            return id;
+        }
+
+        public static Optional<Sensors> fromId(String id) {
+            return Arrays.stream(Sensors.values())
+                    .filter(sensors -> sensors.getId().equalsIgnoreCase(id))
+                    .findFirst();
+        }
+
+        public String getLocalizedName(Context context) {
+            try {
+                return context.getResources().getString(R.string.class.getField(id).getInt(R.string.class));
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                return id;
+            }
+        }
+    }
+
+    public static SensorData createSensorDataObjectFromValues(JSONObject data) {
+        SensorData sensorData = new SensorData();
 
         // get all sensor values
         try {

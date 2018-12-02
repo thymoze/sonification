@@ -4,9 +4,13 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -16,10 +20,16 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.helpers.SensorDataHelper;
 import mupro.hcm.sonification.helpers.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
@@ -27,15 +37,12 @@ import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 public class ChartsFragment extends Fragment {
 
     private static String TAG = "ChartsFragment";
+    private SensorDataReceiver sensorDataReceiver;
 
-    @BindView(R.id.chart_part10)
-    LineChart chartPart10;
-
-    @BindView(R.id.chart_part25)
-    LineChart chartPart25;
+    @BindView(R.id.charts_container)
+    LinearLayout charts_container;
 
     public ChartsFragment() {
-        // Required empty public constructor
     }
 
     public static ChartsFragment newInstance() {
@@ -47,112 +54,50 @@ public class ChartsFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    private LineDataSet createSet(LineChart chart) {
-        LineDataSet set = new LineDataSet(null, "DataSet 1");
-        set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        set.setCubicIntensity(0.2f);
-        set.setDrawFilled(true);
-        set.setDrawCircles(false);
-        set.setLineWidth(1.8f);
-        set.setCircleRadius(4f);
-        set.setCircleColor(Color.WHITE);
-        set.setHighLightColor(Color.rgb(244, 117, 117));
-        set.setColor(Color.WHITE);
-        set.setFillColor(Color.WHITE);
-        set.setFillAlpha(100);
-        set.setDrawHorizontalHighlightIndicator(false);
-        set.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
-
-        return set;
-    }
-
-    public void addEntryToChart(LineChart chart, float value) {
-        LineData data = chart.getData();
-
-        if (data == null) {
-            data = new LineData();
-            chart.setData(data);
-        }
-
-        ILineDataSet set = data.getDataSetByIndex(0);
-        // set.addEntry(...); // can be called as well
-
-        if (set == null) {
-            set = createSet(chart);
-            data.addDataSet(set);
-        }
-
-        data.addEntry(new Entry(set.getEntryCount(), value), 0);
-        data.notifyDataChanged();
-
-        // let the chart know it's data has changed
-        chart.notifyDataSetChanged();
-
-        chart.setVisibleXRangeMaximum(20);
-        //chart.setVisibleYRangeMaximum(15, AxisDependency.LEFT);
-//
-//            // this automatically refreshes the chart (calls invalidate())
-        chart.moveViewTo(data.getEntryCount() - 7, 50f, YAxis.AxisDependency.LEFT);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_charts, container, false);
         ButterKnife.bind(this, view);
 
-        initChart(chartPart25);
-        initChart(chartPart10);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        for (SensorDataHelper.Sensors s : SensorDataHelper.Sensors.values()) {
+            Fragment fragment = ChartCardFragment.newInstance(s);
+            transaction.add(R.id.charts_container, fragment, s.getId());
+        }
+        transaction.commit();
 
-        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::updateCharts);
+        sensorDataReceiver = new SensorDataReceiver(this::updateCharts);
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
         getContext().registerReceiver(sensorDataReceiver, intentFilter);
 
         return view;
     }
 
-    private Void updateCharts(SensorData data) {
-        if (data.getPm25() != 0)
-            addEntryToChart(chartPart25, ((Double) data.getPm25()).floatValue());
-        if (data.getPm10() != 0)
-            addEntryToChart(chartPart25, ((Double) data.getPm10()).floatValue());
-        //and all the other gases
-        //if (json.has("..."))
-
-        return null;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Objects.requireNonNull(getContext()).unregisterReceiver(sensorDataReceiver);
     }
 
-    private void initChart(LineChart chart) {
-        chart.setBackgroundColor(Color.rgb(104, 241, 175));
+    private Void updateCharts(SensorData data) {
+        FragmentManager fragmentManager = getFragmentManager();
+        for (SensorDataHelper.Sensors s : SensorDataHelper.Sensors.values()) {
+            if (fragmentManager != null) {
+                ChartCardFragment fragment = (ChartCardFragment) fragmentManager.findFragmentByTag(s.getId());
 
-        // no description text
-        chart.getDescription().setEnabled(false);
+                if (fragment != null) {
+                    Double val = data.get(s);
+                    if (val != null) {
+                        float x = (float) data.getId();
+                        float y = val.floatValue();
+                        Log.i(TAG, String.format("(%f, %f)", x, y));
+                        fragment.addEntryToChart(x, y);
+                    }
+                }
+            }
+        }
 
-        // enable touch gestures
-        chart.setTouchEnabled(true);
-
-        // enable scaling and dragging
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-
-        // if disabled, scaling can be done on x- and y-axis separately
-        chart.setPinchZoom(false);
-
-        chart.setDrawGridBackground(false);
-        chart.setMaxHighlightDistance(300);
-
-        chart.getLegend().setEnabled(false);
-
-        XAxis x = chart.getXAxis();
-        x.setEnabled(false);
-
-        YAxis y = chart.getAxisLeft();
-        y.setLabelCount(6, false);
-        y.setTextColor(Color.WHITE);
-        y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
-        y.setDrawGridLines(false);
-        y.setAxisLineColor(Color.WHITE);
-
-        chart.getAxisRight().setEnabled(false);
+        return null;
     }
 }

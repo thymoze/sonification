@@ -64,9 +64,8 @@ public class UdpService extends IntentService {
 
                 try {
                     JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
-                    SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(null, data);
-                    sensorData.setTimestamp(Instant.now().toString());
-
+                    SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(data);
+                    sensorData.setTimestamp(Instant.now());
                     returnData(sensorData);
                 } catch (JSONException e) {
                     e.printStackTrace();

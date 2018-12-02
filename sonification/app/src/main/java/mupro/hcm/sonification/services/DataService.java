@@ -48,9 +48,11 @@ public class DataService extends Service {
         startService(intent);
     }
 
-    private void saveDataToDatabase(SensorData sensorData) {
+    private long saveDataToDatabase(SensorData sensorData) {
         if (sensorData != null)
-            AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insertAll(sensorData);
+            return AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
+        else
+            return -1;
     }
 
     private Notification buildForegroundNotification() {
@@ -83,7 +85,7 @@ public class DataService extends Service {
 
         private static final String TAG = "LocationReceiver";
 
-        public UdpDataReceiver(Handler handler) {
+        UdpDataReceiver(Handler handler) {
             super(handler);
         }
 
@@ -97,6 +99,9 @@ public class DataService extends Service {
 
                 data.setLatitude(callback.latitude);
                 data.setLongitude(callback.longitude);
+
+                long id = saveDataToDatabase(data);
+                data.setId(id);
 
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);

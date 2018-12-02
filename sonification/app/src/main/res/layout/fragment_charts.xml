@@ -1,28 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     tools:context=".fragments.ChartsFragment">
 
-    <TextView
-        android:text="Particulate 2.5"
+    <LinearLayout android:id="@+id/charts_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_part25"
-        android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingVertical="8dp"
+        android:clipChildren="false">
 
-    <TextView
-        android:text="Particulate 10"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_part10"
-        android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        <!--<fragment class="mupro.hcm.sonification.fragments.ChartCardFragment"
+            android:id="@+id/part25_frag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-</LinearLayout>
+        </fragment>
+
+        <android.support.design.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:layout_marginHorizontal="@dimen/charts_card_horizontal_margin"
+            android:layout_marginBottom="@dimen/charts_card_vertical_margin">
+            <TextView
+                android:text="Particulate 10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </android.support.design.card.MaterialCardView>
+
+        <android.support.design.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:layout_marginHorizontal="@dimen/charts_card_horizontal_margin"
+            android:layout_marginBottom="@dimen/charts_card_vertical_margin">
+            <TextView
+                android:text="Some other shit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </android.support.design.card.MaterialCardView>
+
+        <android.support.design.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:layout_marginHorizontal="@dimen/charts_card_horizontal_margin"
+            android:layout_marginBottom="@dimen/charts_card_vertical_margin">
+            <TextView
+                android:text="And even more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </android.support.design.card.MaterialCardView>
+
+        <android.support.design.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:layout_marginHorizontal="@dimen/charts_card_horizontal_margin"
+            android:layout_marginBottom="@dimen/charts_card_vertical_margin">
+            <TextView
+                android:text="and finally one last piece"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </android.support.design.card.MaterialCardView>-->
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

@@ -3,14 +3,20 @@ package mupro.hcm.sonification.database;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Optional;
+
+import static mupro.hcm.sonification.helpers.SensorDataHelper.*;
 
 @Entity
 public class SensorData implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "pm10")
     private double pm10;
@@ -61,13 +67,22 @@ public class SensorData implements Serializable {
     private double latitude;
 
     @ColumnInfo(name = "timestamp")
-    private String timestamp;
+    @TypeConverters(AppDatabase.class)
+    private Instant timestamp;
 
-    public int getId() {
+    public Double get(Sensors s) {
+        switch (s) {
+            case PM25: return getPm25();
+            case PM10: return getPm10();
+        }
+        return null;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -199,11 +214,11 @@ public class SensorData implements Serializable {
         this.latitude = latitude;
     }
 
-    public String getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 }
