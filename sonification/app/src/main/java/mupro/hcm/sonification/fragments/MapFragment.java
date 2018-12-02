@@ -53,6 +53,10 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::addMarker);
+        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
+        getContext().registerReceiver(sensorDataReceiver, intentFilter);
+
         super.onCreate(savedInstanceState);
     }
 
@@ -64,10 +68,6 @@ public class MapFragment extends Fragment implements
 
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mSupportMapFragment.getMapAsync(this);
-
-        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::updateMap);
-        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        getContext().registerReceiver(sensorDataReceiver, intentFilter);
 
         return v;
     }
@@ -85,9 +85,11 @@ public class MapFragment extends Fragment implements
                     .build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
         }));
+
+        this.googleMap = googleMap;
     }
 
-    public void addMarker(SensorData data) {
+    private Void addMarker(SensorData data) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(data.getLatitude(), data.getLongitude()))
                 .title(data.getTimestamp()));
@@ -98,31 +100,14 @@ public class MapFragment extends Fragment implements
                 .zoom(15.0f)
                 .build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+
+        Log.i(TAG, "Marker added for " + data.getTimestamp());
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        // Retrieve the data from the marker.
-        Integer clickCount = (Integer) marker.getTag();
-
-        // Check if a click count was set, then display the click count.
-        marker.setTag(clickCount);
         Toast.makeText(getContext(), marker.getTitle(), Toast.LENGTH_SHORT).show();
 
-        if (marker.getTag() != null)
-            Toast.makeText(getContext(), ((SensorData) marker.getTag()).getTimestamp(), Toast.LENGTH_LONG).show();
-
-        // Return false to indicate that we have not consumed the event and that we wish
-        // for the default behavior to occur (which is for the camera to move such that the
-        // marker is centered and for the marker's info window to open, if it has one).
         return false;
-
-    }
-
-    private Void updateMap(SensorData data) {
-        addMarker(data);
-        Log.i(TAG, "Marker added for " + data.getTimestamp());
-
-        return null;
     }
 }

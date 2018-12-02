@@ -25,8 +25,8 @@ public class SensorDataReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SensorData data = ((SensorData) intent.getSerializableExtra("data"));
-        Log.i(TAG, data.getTimestamp());
+        Log.i(TAG, intent.getSerializableExtra("sensorData").toString());
+        SensorData data = (SensorData) intent.getSerializableExtra("sensorData");
         callback.apply(data);
     }
 }

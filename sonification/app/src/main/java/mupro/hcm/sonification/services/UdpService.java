@@ -2,6 +2,8 @@ package mupro.hcm.sonification.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -26,6 +28,10 @@ public class UdpService extends IntentService {
 
     private static final String TAG = "UdpService";
     private static final int PORT = 7777;
+    private ResultReceiver receiver;
+
+    private final int LOCATION_SUCCESS = 1;
+    private final int LOCATION_ERROR = 2;
 
     private boolean running = false;
 
@@ -35,16 +41,18 @@ public class UdpService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        receiver = intent.getParcelableExtra("receiver");
+
         if (!running) {
             Log.i(TAG, "Starting UdpService.");
             running = true;
-            runServer(intent);
+            runServer();
         } else {
             running = false;
         }
     }
 
-    private void runServer(Intent intent) {
+    private void runServer() {
         byte[] msg = new byte[4096];
         DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
@@ -54,29 +62,28 @@ public class UdpService extends IntentService {
                 ds.receive(dp);
                 Log.i(TAG, "Received object.");
 
-                // add location
-                FusedLocationProvider.requestSingleUpdate(UdpService.this, (location -> {
-                    Log.i(TAG, "Got Location");
+                try {
+                    JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
+                    SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(null, data);
+                    sensorData.setTimestamp(Instant.now().toString());
 
-                    try {
-                        JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
-                        SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(location, data);
-                        sensorData.setTimestamp(Instant.now().toString());
-
-                        Intent broadcastIntent = new Intent();
-                        broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
-                        broadcastIntent.putExtra("data", sensorData);
-
-                        sendBroadcast(broadcastIntent);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }));
+                    returnData(sensorData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
     }
 
-
+    private void returnData(SensorData data) {
+        if (data != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("sensorData", data);
+            receiver.send(LOCATION_SUCCESS, bundle);
+        } else {
+            receiver.send(LOCATION_ERROR, Bundle.EMPTY);
+        }
+    }
 }
