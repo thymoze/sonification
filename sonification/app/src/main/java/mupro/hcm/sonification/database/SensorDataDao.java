@@ -14,13 +14,13 @@ import java.util.List;
 @Dao
 public interface SensorDataDao {
 
-    @Query("SELECT * FROM sensordata")
+    @Query("SELECT * FROM SensorData")
     List<SensorData> getAll();
 
     @Query("SELECT * FROM SensorData ORDER BY datetime(timestamp) DESC LIMIT 30")
     List<SensorData> getLast30();
 
-    @Query("SELECT * FROM sensordata WHERE id IN (:dataIds)")
+    @Query("SELECT * FROM SensorData WHERE id IN (:dataIds)")
     List<SensorData> loadAllByIds(int[] dataIds);
 
     @Query("SELECT timestamp FROM SensorData WHERE id = (:id)")
@@ -35,4 +35,7 @@ public interface SensorDataDao {
 
     @Delete
     void delete(SensorData data);
+
+    @Query("SELECT * FROM SensorData WHERE dataSetId=(:id)")
+    List<SensorData> getSensorDataForDataSet(final int id);
 }

@@ -8,10 +8,12 @@ import android.content.Context;
 
 import java.time.Instant;
 
-@Database(entities = {SensorData.class}, version = 1)
+@Database(entities = {SensorData.class, DataSet.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
-    
+
     public abstract SensorDataDao sensorDataDao();
+
+    public abstract DataSetDao dataSetDao();
 
     private static volatile AppDatabase INSTANCE;
 

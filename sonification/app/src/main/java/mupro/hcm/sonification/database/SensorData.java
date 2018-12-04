@@ -2,21 +2,27 @@ package mupro.hcm.sonification.database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Optional;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static mupro.hcm.sonification.helpers.SensorDataHelper.*;
 
-@Entity
+@Entity(foreignKeys = @ForeignKey(entity = DataSet.class,
+        parentColumns = "id",
+        childColumns = "dataSetId",
+        onDelete = CASCADE))
 public class SensorData implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
+
+    @ColumnInfo(name = "dataSetId")
+    private long dataSetId;
 
     @ColumnInfo(name = "pm10")
     private double pm10;
@@ -86,6 +92,14 @@ public class SensorData implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getDataSetId() {
+        return dataSetId;
+    }
+
+    public void setDataSetId(long dataSetId) {
+        this.dataSetId = dataSetId;
     }
 
     public double getPm10() {

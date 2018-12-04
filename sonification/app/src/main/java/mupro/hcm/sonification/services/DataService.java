@@ -18,6 +18,7 @@ import android.widget.Toast;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
+import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.FusedLocationProvider;
 
@@ -31,6 +32,7 @@ public class DataService extends Service {
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
     private UdpDataReceiver udpDataReceiver;
+    private long currentDataSetId = -1;
 
     @Override
     public void onCreate() {
@@ -48,8 +50,15 @@ public class DataService extends Service {
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
-        if (sensorData != null)
+        if (currentDataSetId == -1) {
+            DataSet dataSet = new DataSet("Cooler Name", sensorData.getTimestamp());
+            currentDataSetId = AppDatabase.getDatabase(getApplicationContext()).dataSetDao().insert(dataSet);
+        }
+
+        if (sensorData != null) {
+            sensorData.setDataSetId(currentDataSetId);
             return AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
+        }
         else
             return -1;
     }
