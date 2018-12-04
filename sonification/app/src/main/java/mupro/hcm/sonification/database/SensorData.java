@@ -72,8 +72,10 @@ public class SensorData implements Serializable {
 
     public Double get(Sensors s) {
         switch (s) {
-            case PM25: return getPm25();
-            case PM10: return getPm10();
+            case PM25:
+                return getPm25();
+            case PM10:
+                return getPm10();
         }
         return null;
     }
@@ -220,5 +222,22 @@ public class SensorData implements Serializable {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String toString() {
+        return "Time: \t" + getTimestamp() + "\n" +
+                "Lat: \t" + getLatitude() + "\n" +
+                "Long: \t" + getLongitude() + "\n" +
+                "PM10: \t" + getPm10() + "\n" +
+                "PM2.5: \t" + getPm25() + "\n" +
+                "Humidity: \t" + getHumidity() + "\n" +
+                "Temperature: \t" + getTemperatureSHT() + "\n" +
+                "CO: \t" + getCo() + "\n" +
+                "NO2: \t" + getNo2() + "\n" +
+                "NH3: \t" + getNh3() + "\n" +
+                "C3H8: \t" + getC3h8() + "\n" +
+                "C4H10: \t" + getC4h10() + "\n" +
+                "H2: \t" + getH2() + "\n" +
+                "C2H5OH: \t" + getC2h5oh() + "\n";
     }
 }

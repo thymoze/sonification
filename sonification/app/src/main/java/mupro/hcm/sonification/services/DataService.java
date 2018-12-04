@@ -13,14 +13,13 @@ import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.FusedLocationProvider;
-
-import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
 public class DataService extends Service {
 
@@ -102,6 +101,8 @@ public class DataService extends Service {
 
                 long id = saveDataToDatabase(data);
                 data.setId(id);
+
+                Toast.makeText(DataService.this, "Data received!\n" + data.toString(), Toast.LENGTH_LONG).show();
 
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
