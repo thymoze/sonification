@@ -5,8 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -33,6 +34,7 @@ public class DataService extends Service {
     private String notificationTitle = "Sonification";
     private UdpDataReceiver udpDataReceiver;
     private long currentDataSetId = -1;
+    private boolean receiving = false;
 
     @Override
     public void onCreate() {
@@ -47,6 +49,7 @@ public class DataService extends Service {
         Intent intent = new Intent(DataService.this, UdpService.class);
         intent.putExtra("receiver", udpDataReceiver);
         startService(intent);
+        receiving = true;
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
@@ -54,13 +57,15 @@ public class DataService extends Service {
         if (currentDataSetId == -1) {
             DataSet dataSet = new DataSet("Cooler Name", sensorData.getTimestamp());
             currentDataSetId = AppDatabase.getDatabase(getApplicationContext()).dataSetDao().insert(dataSet);
+
+            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
+            sharedPreferences.edit().putLong("CURRENT_DATA_ID", currentDataSetId).apply();
         }
 
         if (sensorData != null) {
             sensorData.setDataSetId(currentDataSetId);
             return AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
-        }
-        else
+        } else
             return -1;
     }
 
@@ -76,7 +81,7 @@ public class DataService extends Service {
                 .setSmallIcon(R.drawable.common_full_open_on_phone)
                 .setContentTitle(notificationTitle)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("The Sonification App is currently running in the background and tracking your position."))
+                        .bigText("The Sonification App is currently receiving in the background and tracking your position."))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent);
 
@@ -105,6 +110,9 @@ public class DataService extends Service {
 
             FusedLocationProvider.requestSingleUpdate(DataService.this, (callback -> {
                 Log.i(TAG, "Got location");
+
+                if (!receiving)
+                    return;
 
                 data.setLatitude(callback.latitude);
                 data.setLongitude(callback.longitude);
@@ -142,6 +150,7 @@ public class DataService extends Service {
         this.notificationManager = null;
         Intent intent = new Intent(DataService.this, UdpService.class);
         stopService(intent);
+        receiving = false;
     }
 }
 

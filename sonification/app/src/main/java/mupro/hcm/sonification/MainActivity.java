@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-
         switchFragment(HomeFragment.newInstance());
 
         checkEverything();

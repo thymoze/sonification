@@ -1,7 +1,9 @@
 package mupro.hcm.sonification.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,7 +21,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
 import mupro.hcm.sonification.R;
+import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.FusedLocationProvider;
 import mupro.hcm.sonification.helpers.SensorDataReceiver;
@@ -87,12 +94,23 @@ public class MapFragment extends Fragment implements
         }));
 
         this.googleMap = googleMap;
+        initializeMarkers();
+    }
+
+    private void initializeMarkers() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        long dataSetId = sharedPreferences.getLong("CURRENT_DATA_ID", -1);
+
+        Log.i(TAG, "CURRENT_DATA_ID: " +  dataSetId);
+
+        if (dataSetId != -1)
+            AppDatabase.getDatabase(getContext()).sensorDataDao().getSensorDataForDataSet(dataSetId).forEach(this::addMarker);
     }
 
     private Void addMarker(SensorData data) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(data.getLatitude(), data.getLongitude()))
-                .title(data.getTimestamp().toString()));
+                .title(DateTimeFormatter.ofPattern("dd.MM.yyyy - hh:mm").format(LocalDateTime.ofInstant(data.getTimestamp(), ZoneOffset.UTC))));
         marker.setTag(data);
 
         CameraPosition position = new CameraPosition.Builder()
@@ -107,7 +125,7 @@ public class MapFragment extends Fragment implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        Toast.makeText(getContext(), marker.getTitle(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), marker.getTag().toString(), Toast.LENGTH_SHORT).show();
 
         return false;
     }

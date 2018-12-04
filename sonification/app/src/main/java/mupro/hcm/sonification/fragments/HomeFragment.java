@@ -1,6 +1,8 @@
 package mupro.hcm.sonification.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,7 +19,6 @@ import mupro.hcm.sonification.services.DataService;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -25,6 +26,8 @@ import mupro.hcm.sonification.services.DataService;
 public class HomeFragment extends Fragment {
 
     private boolean running = false;
+    private SharedPreferences sharedPreferences;
+
     @BindView(R.id.btnStart)
     Button btnStart;
     @BindView(R.id.btnStop)
@@ -45,6 +48,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        sharedPreferences = getContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
         super.onCreate(savedInstanceState);
 
     }
@@ -55,6 +59,9 @@ public class HomeFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, v);
+
+        running = sharedPreferences.getBoolean("SERVICE_RUNNING", false);
+
         btnStart.setEnabled(!running);
         btnStop.setEnabled(running);
 
@@ -65,14 +72,16 @@ public class HomeFragment extends Fragment {
     public void start() {
         startDataService();
         toggleButtons();
+        sharedPreferences.edit().putBoolean("SERVICE_RUNNING", true).apply();
     }
 
     @OnClick(R.id.btnStop)
     public void stop() {
         stopDataService();
         toggleButtons();
+        sharedPreferences.edit().putBoolean("SERVICE_RUNNING", false).apply();
+        sharedPreferences.edit().putLong("CURRENT_DATA_ID", -1).apply();
     }
-
 
     private void toggleButtons() {
         this.running = !this.running;

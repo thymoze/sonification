@@ -37,5 +37,5 @@ public interface SensorDataDao {
     void delete(SensorData data);
 
     @Query("SELECT * FROM SensorData WHERE dataSetId=(:id)")
-    List<SensorData> getSensorDataForDataSet(final int id);
+    List<SensorData> getSensorDataForDataSet(final long id);
 }
