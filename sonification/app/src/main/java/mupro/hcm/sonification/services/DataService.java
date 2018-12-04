@@ -27,7 +27,7 @@ public class DataService extends Service {
     private final String TAG = "DataService";
 
     // needed for notification
-    NotificationManager notificationManager;
+    private NotificationManager notificationManager;
     private static String CHANNEL_ID = "1338";
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
@@ -50,6 +50,7 @@ public class DataService extends Service {
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
+        Log.i(TAG, "ID: " + currentDataSetId);
         if (currentDataSetId == -1) {
             DataSet dataSet = new DataSet("Cooler Name", sensorData.getTimestamp());
             currentDataSetId = AppDatabase.getDatabase(getApplicationContext()).dataSetDao().insert(dataSet);
@@ -126,6 +127,21 @@ public class DataService extends Service {
 
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopForeground(true);
+        stopReceivingData();
+        Log.i(TAG, "onDestroy");
+    }
+
+    public void stopReceivingData() {
+        this.udpDataReceiver = null;
+        this.notificationManager = null;
+        Intent intent = new Intent(DataService.this, UdpService.class);
+        stopService(intent);
     }
 }
 

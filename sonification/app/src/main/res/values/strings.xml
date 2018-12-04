@@ -4,6 +4,12 @@
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
 
+    <!-- Home -->
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <!-- TODO: remove later -->
+    <string name="warning">Achtung! Bitte überprüfe immer, dass tatsächlich Werte ankommen (warte, bis der erste Toast erscheint). Wenn innerhalb von circa einer halben Minute nichts passiert, kann es sein, dass der Port noch nicht freigegeben war, dann einfach stoppen und nochmal starten.</string>
+
     <!-- Charts -->
     <string name="pm25">Feinstaub 2.5</string>
     <string name="pm10">Feinstaub 10</string>

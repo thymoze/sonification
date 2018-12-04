@@ -59,9 +59,12 @@ public class UdpService extends IntentService {
         try (DatagramSocket ds = new DatagramSocket(PORT)) {
             Log.i(TAG, "Listening on port " + PORT);
             while (running) {
+                //TODO: handle the "port already in use" error (maybe intent service to disable button on HomeFragment?)
                 ds.receive(dp);
-                Log.i(TAG, "Received object.");
+                if (!running)
+                    break;
 
+                Log.i(TAG, "Received object.");
                 try {
                     JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
                     SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(data);
@@ -77,12 +80,21 @@ public class UdpService extends IntentService {
     }
 
     private void returnData(SensorData data) {
-        if (data != null) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("sensorData", data);
-            receiver.send(LOCATION_SUCCESS, bundle);
-        } else {
-            receiver.send(LOCATION_ERROR, Bundle.EMPTY);
+        if (receiver != null) {
+            if (data != null) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("sensorData", data);
+                receiver.send(LOCATION_SUCCESS, bundle);
+            } else {
+                receiver.send(LOCATION_ERROR, Bundle.EMPTY);
+            }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.running = false;
+        this.receiver = null;
     }
 }

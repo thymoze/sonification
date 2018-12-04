@@ -63,24 +63,15 @@ public class MainActivity extends AppCompatActivity
 
         switchFragment(HomeFragment.newInstance());
 
-        checkAndStart();
+        checkEverything();
     }
 
-    private void checkAndStart() {
-        if(((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER) && permissionsAreGranted())
-            startDataService();
-
+    private void checkEverything() {
         if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER))
             requestGPSSettings();
 
         if (!permissionsAreGranted())
             requestPermissions();
-    }
-
-    private void startDataService() {
-        final Intent intent = new Intent(this.getApplication(), DataService.class);
-        this.getApplication().startService(intent);
-        this.getApplication().startForegroundService(intent);
     }
 
     private boolean permissionsAreGranted() {
@@ -107,7 +98,7 @@ public class MainActivity extends AppCompatActivity
                 if (report.areAllPermissionsGranted()) {
                     // All good
                     Toast.makeText(getApplicationContext(), "Thanks man!", Toast.LENGTH_SHORT).show();
-                    startDataService();
+                    checkEverything();
                 }
                 // check for permanent denial of any permission
                 if (report.isAnyPermissionPermanentlyDenied()) {
