@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.services.DataService;
 
@@ -22,8 +25,10 @@ import mupro.hcm.sonification.services.DataService;
 public class HomeFragment extends Fragment {
 
     private boolean running = false;
-    private Button btnStart;
-    private Button btnStop;
+    @BindView(R.id.btnStart)
+    Button btnStart;
+    @BindView(R.id.btnStop)
+    Button btnStop;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -49,23 +54,25 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
-
-        btnStart = v.findViewById(R.id.btnStart);
+        ButterKnife.bind(this, v);
         btnStart.setEnabled(!running);
-        btnStart.setOnClickListener(v1 -> {
-            startDataService();
-            toggleButtons();
-        });
-
-        btnStop = v.findViewById(R.id.btnStop);
         btnStop.setEnabled(running);
-        btnStop.setOnClickListener(v1 -> {
-            stopDataService();
-            toggleButtons();
-        });
 
         return v;
     }
+
+    @OnClick(R.id.btnStart)
+    public void start() {
+        startDataService();
+        toggleButtons();
+    }
+
+    @OnClick(R.id.btnStop)
+    public void stop() {
+        stopDataService();
+        toggleButtons();
+    }
+
 
     private void toggleButtons() {
         this.running = !this.running;
