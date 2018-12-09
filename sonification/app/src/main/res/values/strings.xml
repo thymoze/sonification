@@ -16,9 +16,12 @@
     <string name="co">Kohlenmonoxid</string>
     <string name="nh3">Ammoniak</string>
     <string name="no2">Stickstoffdioxid</string>
-    <string name="ethanol">Ethanol</string>
+    <string name="c2h5oh">Ethanol</string>
     <string name="h2">Wasserstoff</string>
     <string name="ch4">Methan</string>
-    <string name="propan">Propan</string>
-    <string name="isobutan">Isobutan</string>
+    <string name="c3h8">Propan</string>
+    <string name="humidity">Luftfeuchtigkeit</string>
+    <string name="pressure">Luftdruck</string>
+    <string name="temperatureSHT">Temperatur (SHT)</string>
+    <string name="temperatureBMP">Temperatur (BMP)</string>
 </resources>

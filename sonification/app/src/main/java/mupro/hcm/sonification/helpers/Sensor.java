@@ -10,7 +10,18 @@ import mupro.hcm.sonification.R;
 public enum Sensor {
     PM25("pm25"),
     PM10("pm10"),
-
+    CO("co"),
+    NH3("nh3"),
+    NO2("no2"),
+    ETHANOL("c2h5oh"),
+    H2("h2"),
+    CH4("ch4"),
+    PROPANE("c3h8"),
+    ISOBUTANE("c4h10"),
+    HUMIDITY("humidity"),
+    PRESSURE("pressure"),
+    TEMP_SHT("temperatureSHT"),
+    TEMP_BMP("temperatureBMP"),
     ;
     private String id;
     Sensor(String id) {

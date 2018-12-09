@@ -24,6 +24,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,8 +86,10 @@ public class ChartCardFragment extends Fragment {
 
     private void loadFromDb() {
         List<SensorData> last30 = AppDatabase.getDatabase(getContext()).sensorDataDao().getAll();
+        Double val;
         for (SensorData data : last30)
-            addEntryToChart((float) data.getId(), data.get(sensor).floatValue());
+            if ((val = data.get(sensor)) != null)
+                addEntryToChart((float) data.getId(), val.floatValue());
     }
 
     // -------------------------------------

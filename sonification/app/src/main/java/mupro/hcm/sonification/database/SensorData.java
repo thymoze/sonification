@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.time.Instant;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+import androidx.annotation.Nullable;
+import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.helpers.Sensor;
 
 @Entity(foreignKeys = @ForeignKey(entity = DataSet.class,
@@ -76,14 +79,12 @@ public class SensorData implements Serializable {
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
 
-    public Double get(Sensor s) {
-        switch (s) {
-            case PM25:
-                return getPm25();
-            case PM10:
-                return getPm10();
+    public @Nullable Double get(Sensor s) {
+        try {
+            return getClass().getField(s.getId()).getDouble(this);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            return null;
         }
-        return null;
     }
 
     public long getId() {
