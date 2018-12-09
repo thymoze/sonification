@@ -2,28 +2,22 @@ package mupro.hcm.sonification.fragments;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
-import org.w3c.dom.Text;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -36,24 +30,21 @@ import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.database.SensorDataDao;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
-
-import static mupro.hcm.sonification.helpers.SensorDataHelper.Sensors;
+import mupro.hcm.sonification.helpers.Sensor;
 
 
 public class ChartCardFragment extends Fragment {
     private static final String TAG = "ChartCardFragment";
     private static final String ARG_SENSOR_NAME = "_sensor_name";
 
-    private Sensors sensor;
+    private Sensor sensor;
 
     @BindView(R.id.chart) LineChart chart;
     @BindView(R.id.label) TextView label;
 
     public ChartCardFragment() {}
 
-    public static ChartCardFragment newInstance(Sensors sensor) {
+    public static ChartCardFragment newInstance(Sensor sensor) {
         ChartCardFragment fragment = new ChartCardFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SENSOR_NAME, sensor.getId());
@@ -65,7 +56,7 @@ public class ChartCardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            sensor = Sensors.fromId(getArguments().getString(ARG_SENSOR_NAME)).get();
+            sensor = Sensor.fromId(getArguments().getString(ARG_SENSOR_NAME)).get();
         }
     }
 

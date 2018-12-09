@@ -21,7 +21,4 @@
     <string name="ch4">Methan</string>
     <string name="propan">Propan</string>
     <string name="isobutan">Isobutan</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

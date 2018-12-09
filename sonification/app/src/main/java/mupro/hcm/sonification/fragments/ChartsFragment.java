@@ -1,7 +1,6 @@
 package mupro.hcm.sonification.fragments;
 
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,18 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.Optional;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +19,7 @@ import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.helpers.SensorDataHelper;
 import mupro.hcm.sonification.helpers.SensorDataReceiver;
+import mupro.hcm.sonification.helpers.Sensor;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -61,7 +50,7 @@ public class ChartsFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        for (SensorDataHelper.Sensors s : SensorDataHelper.Sensors.values()) {
+        for (Sensor s : Sensor.values()) {
             Fragment fragment = ChartCardFragment.newInstance(s);
             transaction.add(R.id.charts_container, fragment, s.getId());
         }
@@ -82,7 +71,7 @@ public class ChartsFragment extends Fragment {
 
     private Void updateCharts(SensorData data) {
         FragmentManager fragmentManager = getFragmentManager();
-        for (SensorDataHelper.Sensors s : SensorDataHelper.Sensors.values()) {
+        for (Sensor s : Sensor.values()) {
             if (fragmentManager != null) {
                 ChartCardFragment fragment = (ChartCardFragment) fragmentManager.findFragmentByTag(s.getId());
 

@@ -17,34 +17,6 @@ public class SensorDataHelper {
 
     private static final String TAG = "SensorDataHelper";
 
-    public enum Sensors {
-        PM25("pm25"),
-        PM10("pm10"),
-        ;
-        private String id;
-        Sensors(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public static Optional<Sensors> fromId(String id) {
-            return Arrays.stream(Sensors.values())
-                    .filter(sensors -> sensors.getId().equalsIgnoreCase(id))
-                    .findFirst();
-        }
-
-        public String getLocalizedName(Context context) {
-            try {
-                return context.getResources().getString(R.string.class.getField(id).getInt(R.string.class));
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                return id;
-            }
-        }
-    }
-
     public static SensorData createSensorDataObjectFromValues(JSONObject data) {
         SensorData sensorData = new SensorData();
 

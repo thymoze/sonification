@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,6 +70,7 @@ public class UdpService extends IntentService {
                     JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
                     SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(data);
                     sensorData.setTimestamp(Instant.now());
+                    Toast.makeText(this, sensorData.getTimestamp().toString(), Toast.LENGTH_LONG).show();
                     returnData(sensorData);
                 } catch (JSONException e) {
                     e.printStackTrace();
