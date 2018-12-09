@@ -5,8 +5,10 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
+import android.util.Log;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -79,10 +81,11 @@ public class SensorData implements Serializable {
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
 
-    public @Nullable Double get(Sensor s) {
+    public @Nullable Double get(String sensor) {
         try {
-            return getClass().getField(s.getId()).getDouble(this);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+            // call getSensor by reflection
+            return (Double) SensorData.class.getMethod("get" + sensor.substring(0, 1).toUpperCase() + sensor.substring(1)).invoke(this);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             return null;
         }
     }

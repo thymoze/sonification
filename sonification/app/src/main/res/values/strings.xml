@@ -11,6 +11,8 @@
     <string name="warning">Achtung! Bitte überprüfe immer, dass tatsächlich Werte ankommen (warte, bis der erste Toast erscheint). Wenn innerhalb von circa einer halben Minute nichts passiert, kann es sein, dass der Port noch nicht freigegeben war, dann einfach stoppen und nochmal starten.</string>
 
     <!-- Charts -->
+    <string name="no_charts">Keine Charts aktiviert.</string>
+
     <string name="pm25">Feinstaub 2.5</string>
     <string name="pm10">Feinstaub 10</string>
     <string name="co">Kohlenmonoxid</string>
@@ -18,6 +20,7 @@
     <string name="no2">Stickstoffdioxid</string>
     <string name="c2h5oh">Ethanol</string>
     <string name="h2">Wasserstoff</string>
+    <string name="c4h10">Isobutan</string>
     <string name="ch4">Methan</string>
     <string name="c3h8">Propan</string>
     <string name="humidity">Luftfeuchtigkeit</string>

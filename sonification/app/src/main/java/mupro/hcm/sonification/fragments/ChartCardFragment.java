@@ -38,17 +38,17 @@ public class ChartCardFragment extends Fragment {
     private static final String TAG = "ChartCardFragment";
     private static final String ARG_SENSOR_NAME = "_sensor_name";
 
-    private Sensor sensor;
+    private String sensor;
 
     @BindView(R.id.chart) LineChart chart;
     @BindView(R.id.label) TextView label;
 
     public ChartCardFragment() {}
 
-    public static ChartCardFragment newInstance(Sensor sensor) {
+    public static ChartCardFragment newInstance(String sensor) {
         ChartCardFragment fragment = new ChartCardFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SENSOR_NAME, sensor.getId());
+        args.putString(ARG_SENSOR_NAME, sensor);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,7 +57,7 @@ public class ChartCardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            sensor = Sensor.fromId(getArguments().getString(ARG_SENSOR_NAME)).get();
+            sensor = getArguments().getString(ARG_SENSOR_NAME);
         }
     }
 
@@ -67,7 +67,7 @@ public class ChartCardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chart_card, container, false);
         ButterKnife.bind(this, view);
 
-        label.setText(sensor.getLocalizedName(getContext()));
+        label.setText(Sensor.fromId(sensor).getLocalizedName(getContext()));
         initChart();
         loadFromDb();
 
@@ -147,7 +147,7 @@ public class ChartCardFragment extends Fragment {
     }
 
     private LineDataSet createSet(LineChart chart) {
-        LineDataSet set = new LineDataSet(null, sensor.getLocalizedName(getContext()));
+        LineDataSet set = new LineDataSet(null, Sensor.fromId(sensor).getLocalizedName(getContext()));
         set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         set.setCubicIntensity(0.2f);
         set.setDrawFilled(true);

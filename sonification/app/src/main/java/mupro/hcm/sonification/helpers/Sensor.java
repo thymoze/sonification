@@ -32,10 +32,11 @@ public enum Sensor {
         return id;
     }
 
-    public static Optional<Sensor> fromId(String id) {
-        return Arrays.stream(Sensor.values())
+    public static Sensor fromId(String id) {
+        Optional<Sensor> s = Arrays.stream(Sensor.values())
                 .filter(sensor -> sensor.getId().equalsIgnoreCase(id))
                 .findFirst();
+        return s.orElse(null);
     }
 
     public String getLocalizedName(Context context) {

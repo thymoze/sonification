@@ -16,7 +16,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     public static final String BROADCAST_ACTION = "mupro.hcm.sonification.broadcast_action";
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @BindView(R.id.navigation)
     BottomNavigationView bottomNavigationView;
 
@@ -59,6 +64,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         switchFragment(HomeFragment.newInstance());
