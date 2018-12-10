@@ -4,6 +4,8 @@
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
 
+    <string name="poweroff">Herunterfahren</string>
+
     <!-- Home -->
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>

@@ -73,6 +73,24 @@ public class MainActivity extends AppCompatActivity
         checkEverything();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.shutdown:
+                // It would be good to be able to shut down the box, so the sd card and our source of truth for logs don't get corrupted.
+                Toast.makeText(this, "TODO: shutdown", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void checkEverything() {
         if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER))
             requestGPSSettings();
