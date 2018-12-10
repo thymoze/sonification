@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,13 +17,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,9 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
-import mupro.hcm.sonification.helpers.SensorDataReceiver;
 import mupro.hcm.sonification.helpers.Sensor;
+import mupro.hcm.sonification.helpers.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 
@@ -77,9 +70,7 @@ public class ChartsFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         no_charts_text.setVisibility(sensors.isEmpty() ? View.VISIBLE : View.GONE);
-        for (String s : sensors) {
-            addFragment(s);
-        }
+        updateFragments();
 
         sensorDataReceiver = new SensorDataReceiver(this::updateCharts);
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
@@ -91,8 +82,9 @@ public class ChartsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Arrays.stream(Sensor.values())
+                .parallel()
                 .sorted(Comparator.comparing(s -> s.getLocalizedName(getContext())))
-                .forEach(s -> {
+                .forEachOrdered(s -> {
                     menu.add(Menu.NONE, s.ordinal() + 1, Menu.NONE, s.getLocalizedName(getContext()))
                             .setCheckable(true)
                             .setChecked(sensors.contains(s.getId()));
@@ -108,12 +100,11 @@ public class ChartsFragment extends Fragment {
         if (item.isChecked()) {
             item.setChecked(false);
             sensors.remove(id);
-            removeFragment(id);
         } else {
             item.setChecked(true);
             sensors.add(id);
-            addFragment(id);
         }
+        updateFragments();
 
         no_charts_text.setVisibility(sensors.isEmpty() ? View.VISIBLE : View.GONE);
 
@@ -136,6 +127,7 @@ public class ChartsFragment extends Fragment {
         FragmentTransaction transaction = requireFragmentManager().beginTransaction();
         transaction.add(R.id.charts_container, ChartCardFragment.newInstance(tag), tag);
         transaction.commit();
+
     }
 
     private void removeFragment(String tag) {
@@ -145,6 +137,23 @@ public class ChartsFragment extends Fragment {
         if (fragment != null)
             transaction.remove(fragment);
         transaction.commit();
+    }
+
+    private void updateFragments() {
+        for (Sensor sensor : Sensor.values()) {
+            Fragment f = getFragmentManager().findFragmentByTag(sensor.getId());
+            if (f != null) {
+                getFragmentManager().beginTransaction().remove(f).commit();
+            }
+        }
+
+        sensors.parallelStream()
+                .sorted(Comparator.comparing(s -> Sensor.fromId(s).getLocalizedName(getContext())))
+                .forEachOrdered(s -> {
+                    FragmentTransaction transaction = requireFragmentManager().beginTransaction();
+                    transaction.add(R.id.charts_container, ChartCardFragment.newInstance(s), s);
+                    transaction.commit();
+                });
     }
 
     private Void updateCharts(SensorData data) {

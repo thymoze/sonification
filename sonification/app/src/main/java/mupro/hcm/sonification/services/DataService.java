@@ -120,7 +120,7 @@ public class DataService extends Service {
                 long id = saveDataToDatabase(data);
                 data.setId(id);
 
-                Toast.makeText(DataService.this, "Data received!\n" + data.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
 
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);

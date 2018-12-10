@@ -1,6 +1,7 @@
 package mupro.hcm.sonification.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -85,9 +86,10 @@ public class ChartCardFragment extends Fragment {
     }
 
     private void loadFromDb() {
-        List<SensorData> last30 = AppDatabase.getDatabase(getContext()).sensorDataDao().getAll();
+        SharedPreferences sp = getContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        List<SensorData> dataset = AppDatabase.getDatabase(getContext()).sensorDataDao().getSensorDataForDataSet(sp.getLong("CURRENT_DATA_ID", -1));
         Double val;
-        for (SensorData data : last30)
+        for (SensorData data : dataset)
             if ((val = data.get(sensor)) != null)
                 addEntryToChart((float) data.getId(), val.floatValue());
     }
@@ -140,8 +142,8 @@ public class ChartCardFragment extends Fragment {
         y.setTextColor(Color.BLACK);
         y.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         y.setDrawAxisLine(false);
-        y.setAxisMinimum(-5);
-        y.setAxisMaximum(5);
+        //y.setAxisMinimum(-5);
+        //y.setAxisMaximum(5);
 
         chart.getAxisRight().setEnabled(false);
     }
@@ -149,7 +151,7 @@ public class ChartCardFragment extends Fragment {
     private LineDataSet createSet(LineChart chart) {
         LineDataSet set = new LineDataSet(null, Sensor.fromId(sensor).getLocalizedName(getContext()));
         set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        set.setCubicIntensity(0.2f);
+        set.setCubicIntensity(0);
         set.setDrawFilled(true);
         set.setDrawCircles(true);
         set.setLineWidth(1.8f);
@@ -174,13 +176,15 @@ public class ChartCardFragment extends Fragment {
             chart.setData(data);
         }
 
-        ILineDataSet set = data.getDataSetByIndex(0);
+        LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
         // set.addEntry(...); // can be called as well
 
         if (set == null) {
             set = createSet(chart);
             data.addDataSet(set);
         }
+
+        set.setCubicIntensity(0);
 
         data.addEntry(new Entry(x, y), 0);
         data.notifyDataChanged();
