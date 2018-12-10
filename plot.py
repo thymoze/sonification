@@ -15,19 +15,19 @@ keywords = {
     'c3h8':           ('Propan',            'ppm',         [0, 50],   40  ),
     'c4h10':          ('Isobutan',          'ppm',         [0, 50],   40  ),
     'ch4':            ('Methan',            'ppm',         [0, 50],   40  ),
-    'h2':             ('Wasserstoff',       'ppm',         [0, 1],    0.55),
-    'humidity':       ('Luftfeuchtigkeit',  'ppm',         [0, 50],   40  ),
     'nh3':            ('Ammoniak',          'ppm',         [1, 50],   20  ),
-    'pressure':       ('Luftdruck',         'ppm',         [0, 50],   40  ),
+    'h2':             ('Wasserstoff',       'ppm',         [0, 1],    0.55),
+    'humidity':       ('Luftfeuchtigkeit',  'ppm',         [0, 50],   None),
+    'pressure':       ('Luftdruck',         'ppm',         [0, 50],   None),
     'temperatureBMP': ('Temperatur (BMP)',  '°C',          [0, 40],   None),
     'temperatureSHT': ('Temperatur (SHT)',  '°C',          [0, 40],   None),
 }
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or sys.argv[1] in ['-h', '--help', '-?']:
+    if len(sys.argv) < 2 or len(sys.argv) > 3 or sys.argv[1] in ['-h', '--help', '-?']:
         print('''USAGE: 
         python plot.py PATH_TO_CSV.csv
-        python plot.py PATH_TO_DATABASE.db
+        python plot.py PATH_TO_DATABASE.db DATASET_INDEX(default=1)
         ''')
         exit(1)
 
@@ -36,7 +36,14 @@ if __name__ == '__main__':
             df = pd.read_csv(file, parse_dates=['timestamp'])
     else:
         con = sqlite3.connect(sys.argv[1])
-        df = pd.read_sql("SELECT * FROM SensorData", con, parse_dates=['timestamp'])
+        try:
+            id = int(sys.argv[2])
+        except Exception:
+            id = 1
+        df = pd.read_sql("SELECT * FROM SensorData WHERE dataSetId = %d" % id, con, parse_dates=['timestamp'])
+        if df.empty:
+            print("Selected DataSet is empty/ does not exist!")
+            exit(0)
 
     # convert timestamp to int so we can do calculations with it
     x = np.int64(df['timestamp'])
@@ -57,7 +64,7 @@ if __name__ == '__main__':
         plt.title(value[0])
         plt.xlabel('Zeit')
         plt.ylabel(value[1])
-        plt.ylim(value[2])
+        plt.ylim(0)
         if value[3] is not None:
             plt.axhline(y=value[3])
     
