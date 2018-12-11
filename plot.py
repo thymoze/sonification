@@ -40,7 +40,11 @@ if __name__ == '__main__':
             id = int(sys.argv[2])
         except Exception:
             id = 1
-        df = pd.read_sql("SELECT * FROM SensorData WHERE dataSetId = %d" % id, con, parse_dates=['timestamp'])
+
+        try:
+            df = pd.read_sql("SELECT * FROM SensorData WHERE dataSetId = %d" % id, con, parse_dates=['timestamp'])
+        except Exception:
+            df = pd.read_sql("SELECT * FROM SensorData", con, parse_dates=['timestamp'])
         if df.empty:
             print("Selected DataSet is empty/ does not exist!")
             exit(0)
