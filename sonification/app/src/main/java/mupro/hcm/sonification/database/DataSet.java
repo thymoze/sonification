@@ -1,11 +1,12 @@
 package mupro.hcm.sonification.database;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
 
 import java.time.Instant;
+
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 @Entity
 public class DataSet {
@@ -13,10 +14,8 @@ public class DataSet {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    @ColumnInfo(name = "name")
     private String name;
 
-    @ColumnInfo(name = "timestamp")
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
 

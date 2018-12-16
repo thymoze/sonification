@@ -1,12 +1,16 @@
 package mupro.hcm.sonification.database;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverter;
+
 import android.content.Context;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverter;
 
 @Database(entities = {SensorData.class, DataSet.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
@@ -22,8 +26,8 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "sonification.db").allowMainThreadQueries().build();
-
+                            AppDatabase.class, "sonification.db")
+                            .build();
                 }
             }
         }

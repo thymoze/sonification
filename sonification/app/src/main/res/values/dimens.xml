@@ -5,4 +5,7 @@
 
     <dimen name="charts_card_horizontal_margin">10dp</dimen>
     <dimen name="charts_card_vertical_margin">10dp</dimen>
+    <dimen name="app_bar_height">120dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

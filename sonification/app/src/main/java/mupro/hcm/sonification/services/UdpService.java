@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,11 +14,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.time.Instant;
 
-import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.fragments.MapFragment;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
+import mupro.hcm.sonification.sensors.SensorDataHelper;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -27,7 +23,7 @@ import mupro.hcm.sonification.helpers.SensorDataHelper;
  */
 public class UdpService extends IntentService {
 
-    private static final String TAG = "UdpService";
+    private static final String TAG = UdpService.class.getName();
     private static final int PORT = 7777;
     private ResultReceiver receiver;
 

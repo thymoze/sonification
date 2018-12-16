@@ -1,4 +1,4 @@
-package mupro.hcm.sonification.helpers;
+package mupro.hcm.sonification.sensors;
 
 import android.content.Context;
 

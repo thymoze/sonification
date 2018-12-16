@@ -1,21 +1,21 @@
 package mupro.hcm.sonification.database;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
-import android.util.Log;
+
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 import androidx.annotation.Nullable;
-import mupro.hcm.sonification.R;
-import mupro.hcm.sonification.helpers.Sensor;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+import mupro.hcm.sonification.sensors.Sensor;
+
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = DataSet.class,
         parentColumns = "id",
@@ -25,66 +25,33 @@ public class SensorData implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
-
-    @ColumnInfo(name = "dataSetId")
     private long dataSetId;
 
-    @ColumnInfo(name = "pm10")
     private double pm10;
-
-    @ColumnInfo(name = "pm25")
     private double pm25;
-
-    @ColumnInfo(name = "humidity")
     private double humidity;
-
-    @ColumnInfo(name = "temperatureSHT")
     private double temperatureSHT;
-
-    @ColumnInfo(name = "pressure")
     private double pressure;
-
-    @ColumnInfo(name = "temperatureBMP")
     private double temperatureBMP;
-
-    @ColumnInfo(name = "co")
     private double co;
-
-    @ColumnInfo(name = "no2")
     private double no2;
-
-    @ColumnInfo(name = "nh3")
     private double nh3;
-
-    @ColumnInfo(name = "c3h8")
     private double c3h8;
-
-    @ColumnInfo(name = "c4h10")
     private double c4h10;
-
-    @ColumnInfo(name = "ch4")
     private double ch4;
-
-    @ColumnInfo(name = "h2")
     private double h2;
-
-    @ColumnInfo(name = "c2h5oh")
     private double c2h5oh;
-
-    @ColumnInfo(name = "longitude")
     private double longitude;
-
-    @ColumnInfo(name = "latitude")
     private double latitude;
 
-    @ColumnInfo(name = "timestamp")
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
 
-    public @Nullable Double get(String sensor) {
+    public @Nullable Double get(Sensor sensor) {
+        String id = sensor.getId();
         try {
-            // call getSensor by reflection
-            return (Double) SensorData.class.getMethod("get" + sensor.substring(0, 1).toUpperCase() + sensor.substring(1)).invoke(this);
+            // call getSensorId by reflection
+            return (Double) SensorData.class.getMethod("get" + id.substring(0, 1).toUpperCase() + id.substring(1)).invoke(this);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             return null;
         }

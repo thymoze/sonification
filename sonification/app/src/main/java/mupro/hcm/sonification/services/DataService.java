@@ -8,20 +8,21 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import mupro.hcm.sonification.MainActivity;
+import mupro.hcm.sonification.NavbarActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
+import mupro.hcm.sonification.location.FusedLocationProvider;
 
 public class DataService extends Service {
 
@@ -33,7 +34,6 @@ public class DataService extends Service {
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
     private UdpDataReceiver udpDataReceiver;
-    private long currentDataSetId = -1;
     private boolean receiving = false;
 
     @Override
@@ -53,25 +53,24 @@ public class DataService extends Service {
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
-        Log.i(TAG, "ID: " + currentDataSetId);
-        if (currentDataSetId == -1) {
-            DataSet dataSet = new DataSet("Cooler Name", sensorData.getTimestamp());
-            currentDataSetId = AppDatabase.getDatabase(getApplicationContext()).dataSetDao().insert(dataSet);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        long id = sharedPreferences.getLong("CURRENT_DATASET", -1);
 
-            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
-            sharedPreferences.edit().putLong("CURRENT_DATA_ID", currentDataSetId).apply();
+        Log.i(TAG, "Saving to database...");
+        if (id != -1) {
+            if (sensorData != null) {
+                sensorData.setDataSetId(id);
+                long sensorId = AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
+                Log.i(TAG, "Saved " + sensorId + " to database...");
+                return sensorId;
+            }
         }
-
-        if (sensorData != null) {
-            sensorData.setDataSetId(currentDataSetId);
-            return AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
-        } else
-            return -1;
+        return -1;
     }
 
     private Notification buildForegroundNotification() {
         // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, NavbarActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -97,8 +96,6 @@ public class DataService extends Service {
 
     private class UdpDataReceiver extends ResultReceiver {
 
-        private static final String TAG = "LocationReceiver";
-
         UdpDataReceiver(Handler handler) {
             super(handler);
         }
@@ -107,6 +104,7 @@ public class DataService extends Service {
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             SensorData data = ((SensorData) resultData.getSerializable("sensorData"));
             Log.i(TAG, "Received: " + data.getTimestamp());
+
 
             FusedLocationProvider.requestSingleUpdate(DataService.this, (callback -> {
                 Log.i(TAG, "Got location");
@@ -117,19 +115,20 @@ public class DataService extends Service {
                 data.setLatitude(callback.latitude);
                 data.setLongitude(callback.longitude);
 
-                long id = saveDataToDatabase(data);
-                data.setId(id);
+                AsyncTask.execute(() -> {
+                    long id = saveDataToDatabase(data);
+                    data.setId(id);
 
+                    Intent broadcastIntent = new Intent();
+                    broadcastIntent.setAction(NavbarActivity.BROADCAST_ACTION);
+                    broadcastIntent.putExtra("sensorData", data);
+
+                    Log.i(TAG, "Sending broadcast for " + id);
+                    sendBroadcast(broadcastIntent);
+                });
                 Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
-                broadcastIntent.putExtra("sensorData", data);
-
-                sendBroadcast(broadcastIntent);
             }));
-
-            super.onReceiveResult(resultCode, resultData);
         }
     }
 

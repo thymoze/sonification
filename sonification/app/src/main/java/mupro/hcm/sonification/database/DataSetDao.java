@@ -1,19 +1,25 @@
 package mupro.hcm.sonification.database;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
+
 
 import java.time.Instant;
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.TypeConverters;
+
 @Dao
 public interface DataSetDao {
 
-    @Query("SELECT * FROM DataSet")
-    List<DataSet> getAll();
+    @Query("SELECT * FROM DataSet WHERE id = (:id)")
+    DataSet getById(long id);
+
+    @Query("SELECT * FROM DataSet ORDER BY id DESC")
+    LiveData<List<DataSet>> getAll();
 
     @Query("SELECT * FROM DataSet ORDER BY datetime(timestamp) DESC LIMIT 30")
     List<DataSet> getLast30();
@@ -33,4 +39,10 @@ public interface DataSetDao {
 
     @Delete
     void delete(DataSet data);
+
+    @Query("DELETE FROM DataSet WHERE id = :id")
+    void deleteById(long id);
+
+    @Query("SELECT COUNT(id) FROM DataSet")
+    int size();
 }

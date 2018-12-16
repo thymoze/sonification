@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +21,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.ref.WeakReference;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
+import androidx.core.util.Pair;
+import androidx.fragment.app.Fragment;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
-import mupro.hcm.sonification.helpers.SensorDataReceiver;
+import mupro.hcm.sonification.database.SensorDataDao;
+import mupro.hcm.sonification.location.FusedLocationProvider;
+import mupro.hcm.sonification.sensors.Sensor;
+import mupro.hcm.sonification.sensors.SensorDataReceiver;
 
-import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.NavbarActivity.BROADCAST_ACTION;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,30 +48,31 @@ import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
  * create an instance of this fragment.
  */
 public class MapFragment extends Fragment implements
-        GoogleMap.OnMarkerClickListener,
-        OnMapReadyCallback {
+        GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
+    private static final String TAG = MapFragment.class.getName();
+    private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
 
-    SupportMapFragment mSupportMapFragment;
-    GoogleMap googleMap;
+    private SupportMapFragment mSupportMapFragment;
+    private GoogleMap mGoogleMap;
 
-    private final String TAG = "MapFragment";
+    private long mDataSetId;
 
-    public MapFragment() {
-        // Required empty public constructor
-    }
+    public MapFragment() {}
 
-    // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance() {
-        return new MapFragment();
+    public static MapFragment newInstance(long dataSetId) {
+        MapFragment fragment = new MapFragment();
+        Bundle args = new Bundle();
+        args.putLong(ARG_DATASET_ID, dataSetId);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(this::addMarker);
-        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-        getContext().registerReceiver(sensorDataReceiver, intentFilter);
-
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mDataSetId = getArguments().getLong(ARG_DATASET_ID);
+        }
     }
 
     @Override
@@ -93,22 +101,16 @@ public class MapFragment extends Fragment implements
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
         }));
 
-        this.googleMap = googleMap;
+        this.mGoogleMap = googleMap;
         initializeMarkers();
     }
 
     private void initializeMarkers() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
-        long dataSetId = sharedPreferences.getLong("CURRENT_DATA_ID", -1);
-
-        Log.i(TAG, "CURRENT_DATA_ID: " +  dataSetId);
-
-        if (dataSetId != -1)
-            AppDatabase.getDatabase(getContext()).sensorDataDao().getSensorDataForDataSet(dataSetId).forEach(this::addMarker);
+        new loadFromDbTask(this).execute(mDataSetId);
     }
 
-    private Void addMarker(SensorData data) {
-        Marker marker = googleMap.addMarker(new MarkerOptions()
+    public Void addMarker(SensorData data) {
+        Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(data.getLatitude(), data.getLongitude()))
                 .title(DateTimeFormatter.ofPattern("dd.MM.yyyy - hh:mm").format(LocalDateTime.ofInstant(data.getTimestamp(), ZoneOffset.UTC))));
         marker.setTag(data);
@@ -117,7 +119,7 @@ public class MapFragment extends Fragment implements
                 .target(new LatLng(data.getLatitude(), data.getLongitude()))
                 .zoom(15.0f)
                 .build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
 
         Log.i(TAG, "Marker added for " + data.getTimestamp());
         return null;
@@ -128,5 +130,30 @@ public class MapFragment extends Fragment implements
         Toast.makeText(getContext(), marker.getTag().toString(), Toast.LENGTH_SHORT).show();
 
         return false;
+    }
+
+    private static class loadFromDbTask extends AsyncTask<Long, SensorData, Void> {
+
+        private SensorDataDao mSensorDataDao;
+        private WeakReference<MapFragment> mContext;
+
+        loadFromDbTask(MapFragment context) {
+            mContext = new WeakReference<>(context);
+            mSensorDataDao = AppDatabase.getDatabase(context.getContext()).sensorDataDao();
+        }
+
+        @Override
+        protected Void doInBackground(Long... dataSetIds) {
+            mSensorDataDao.getSensorDataForDataSet(dataSetIds[0])
+                    .forEach(this::publishProgress);
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(SensorData... values) {
+            MapFragment fragment = mContext.get();
+            if (fragment != null)
+                fragment.addMarker(values[0]);
+        }
     }
 }
