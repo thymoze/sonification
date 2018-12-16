@@ -106,8 +106,9 @@ public class DataService extends Service {
             Log.i(TAG, "Received: " + data.getTimestamp());
 
 
+            Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
             FusedLocationProvider.requestSingleUpdate(DataService.this, (callback -> {
-                Log.i(TAG, "Got location");
+                Toast.makeText(DataService.this, "Location received!", Toast.LENGTH_SHORT).show();
 
                 if (!receiving)
                     return;
@@ -126,7 +127,6 @@ public class DataService extends Service {
                     Log.i(TAG, "Sending broadcast for " + id);
                     sendBroadcast(broadcastIntent);
                 });
-                Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
 
             }));
         }

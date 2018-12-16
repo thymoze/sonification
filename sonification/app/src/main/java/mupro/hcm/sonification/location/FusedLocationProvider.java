@@ -2,6 +2,7 @@ package mupro.hcm.sonification.location;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Looper;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -18,6 +19,7 @@ import com.google.android.gms.location.LocationServices;
 public class FusedLocationProvider {
 
     private final static String TAG = "FusedLocationProvider";
+    private static GPSCoordinates lastKnownLocation;
 
     public interface LocationGPSCallback {
         void onNewLocationAvailable(GPSCoordinates location);
@@ -29,15 +31,18 @@ public class FusedLocationProvider {
         mLocationRequest.setNumUpdates(1);
         mLocationRequest.setInterval(500);
         mLocationRequest.setFastestInterval(250);
+        mLocationRequest.setMaxWaitTime(2000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationCallback mLocationCallback = new LocationCallback() {
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
+                    callback.onNewLocationAvailable(lastKnownLocation);
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
                     GPSCoordinates loc = new GPSCoordinates(location.getLongitude(), location.getLatitude());
+                    lastKnownLocation = loc;
                     Log.i(TAG, loc.toString());
                     callback.onNewLocationAvailable(loc);
                 }
@@ -45,7 +50,7 @@ public class FusedLocationProvider {
         };
 
         try {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
         } catch (SecurityException ex) {
             Log.e(TAG, "Failed to request location update!", ex);
         }

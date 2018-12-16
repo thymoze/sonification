@@ -20,12 +20,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.lang.ref.WeakReference;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.core.util.Pair;
@@ -54,6 +57,8 @@ public class MapFragment extends Fragment implements
 
     private SupportMapFragment mSupportMapFragment;
     private GoogleMap mGoogleMap;
+    private List<Polyline> polylines;
+    private SensorData previousData;
 
     private long mDataSetId;
 
@@ -70,6 +75,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        polylines = new ArrayList<>();
         if (getArguments() != null) {
             mDataSetId = getArguments().getLong(ARG_DATASET_ID);
         }
@@ -120,6 +126,16 @@ public class MapFragment extends Fragment implements
                 .zoom(15.0f)
                 .build();
         mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+
+        // add a polyline if there was previous data
+        if (previousData != null) {
+            PolylineOptions options = new PolylineOptions().add(new LatLng(previousData.getLatitude(), previousData.getLongitude()))
+                    .add(new LatLng(data.getLatitude(), data.getLongitude()));
+            Polyline line = mGoogleMap.addPolyline(options);
+            line.setZIndex(1000);
+            polylines.add(line);
+        }
+        previousData = data;
 
         Log.i(TAG, "Marker added for " + data.getTimestamp());
         return null;
