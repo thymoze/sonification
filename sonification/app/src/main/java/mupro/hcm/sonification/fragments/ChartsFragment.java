@@ -95,7 +95,7 @@ public class ChartsFragment extends Fragment {
                 .parallel()
                 .sorted(Comparator.comparing(s -> s.getLocalizedName(getContext())))
                 .forEachOrdered(s -> {
-                    menu.add(Menu.NONE, s.ordinal() + 1, Menu.NONE, s.getLocalizedName(getContext()))
+                    menu.add(99, s.ordinal() + 1, Menu.NONE, s.getLocalizedName(getContext()))
                             .setCheckable(true)
                             .setChecked(mSensors.contains(s.getId()));
                 });
@@ -105,27 +105,27 @@ public class ChartsFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO: Check that the menuitem isnt the back button
-        String id = Sensor.values()[item.getItemId() - 1].getId();
+        if (item.getGroupId() == 99) {
+            String id = Sensor.values()[item.getItemId() - 1].getId();
 
-        if (item.isChecked()) {
-            item.setChecked(false);
-            mSensors.remove(id);
-        } else {
-            item.setChecked(true);
-            mSensors.add(id);
+            if (item.isChecked()) {
+                item.setChecked(false);
+                mSensors.remove(id);
+            } else {
+                item.setChecked(true);
+                mSensors.add(id);
+            }
+            //new FragmentLoader(this).execute();
+            updateFragments();
+
+            no_charts_text.setVisibility(mSensors.isEmpty() ? View.VISIBLE : View.GONE);
+
+            sharedPreferences.edit()
+                    .putStringSet("CHART_LIST", mSensors)
+                    .apply();
         }
-        //new FragmentLoader(this).execute();
-        updateFragments();
 
-        no_charts_text.setVisibility(mSensors.isEmpty() ? View.VISIBLE : View.GONE);
-
-        sharedPreferences.edit()
-                .putStringSet("CHART_LIST", mSensors)
-                .apply();
-
-
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateFragments() {
