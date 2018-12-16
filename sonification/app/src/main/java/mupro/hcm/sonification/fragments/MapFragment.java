@@ -1,9 +1,6 @@
 package mupro.hcm.sonification.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,24 +21,18 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.lang.ref.WeakReference;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.database.SensorDataDao;
 import mupro.hcm.sonification.location.FusedLocationProvider;
-import mupro.hcm.sonification.sensors.Sensor;
-import mupro.hcm.sonification.sensors.SensorDataReceiver;
-
-import static mupro.hcm.sonification.NavbarActivity.BROADCAST_ACTION;
 
 /**
  * A simple {@link Fragment} subclass.

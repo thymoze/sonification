@@ -9,7 +9,6 @@ import android.util.Log;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -29,7 +28,8 @@ import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 
-import static mupro.hcm.sonification.NavbarActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 
 public class DataActivity extends AppCompatActivity {
     private static final String TAG = DataActivity.class.getName();
@@ -105,7 +105,7 @@ public class DataActivity extends AppCompatActivity {
         super.onStart();
 
         long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
-                .getLong("CURRENT_DATASET", -1);
+                .getLong(CURRENT_DATASET, -1);
 
         if (mDataSet.getId() == currDataSetId) {
             registerReceivers();

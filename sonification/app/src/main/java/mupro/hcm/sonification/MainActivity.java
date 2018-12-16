@@ -16,6 +16,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,8 +46,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
@@ -63,11 +62,13 @@ import mupro.hcm.sonification.dataset.DataSetListAdapter;
 import mupro.hcm.sonification.dataset.DataSetViewModel;
 import mupro.hcm.sonification.services.DataService;
 
-import static mupro.hcm.sonification.NavbarActivity.REQUEST_CHECK_SETTINGS;
-
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = MainActivity.class.getName();
+
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+    public static final String BROADCAST_ACTION = TAG.concat("broadcast_action");
+    public static final String CURRENT_DATASET = "CURRENT_DATASET";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -146,9 +147,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.navigation, menu);
+        if (getSharedPreferences("DATA", MODE_PRIVATE)
+                .getLong(CURRENT_DATASET, -1) != -1) {
+            getMenuInflater().inflate(R.menu.stop_menu, menu);
+        }
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.stop:
+                stopDataService();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @OnClick(R.id.start_new_btn)
@@ -188,11 +210,21 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, DataService.class);
         startService(intent);
         startForegroundService(intent);
+
+        invalidateOptionsMenu();
+        startNewButton.setVisibility(View.INVISIBLE);
     }
 
     private void stopDataService() {
         final Intent intent = new Intent(this, DataService.class);
         stopService(intent);
+
+        getSharedPreferences("DATA", MODE_PRIVATE)
+                .edit()
+                .remove(CURRENT_DATASET)
+                .apply();
+        invalidateOptionsMenu();
+        startNewButton.setVisibility(View.VISIBLE);
     }
 
     private void checkPermissions() {
@@ -293,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
             if (context != null) {
                 context.getSharedPreferences("DATA", MODE_PRIVATE)
                         .edit()
-                        .putLong("CURRENT_DATASET", id)
+                        .putLong(CURRENT_DATASET, id)
                         .apply();
             }
             return id;

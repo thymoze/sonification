@@ -13,16 +13,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import mupro.hcm.sonification.NavbarActivity;
+import androidx.core.app.NotificationCompat;
+import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
-import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.location.FusedLocationProvider;
+
+import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 
 public class DataService extends Service {
 
@@ -54,7 +56,7 @@ public class DataService extends Service {
 
     private long saveDataToDatabase(SensorData sensorData) {
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
-        long id = sharedPreferences.getLong("CURRENT_DATASET", -1);
+        long id = sharedPreferences.getLong(CURRENT_DATASET, -1);
 
         Log.i(TAG, "Saving to database...");
         if (id != -1) {
@@ -70,7 +72,7 @@ public class DataService extends Service {
 
     private Notification buildForegroundNotification() {
         // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, NavbarActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -121,7 +123,7 @@ public class DataService extends Service {
                     data.setId(id);
 
                     Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(NavbarActivity.BROADCAST_ACTION);
+                    broadcastIntent.setAction(BROADCAST_ACTION);
                     broadcastIntent.putExtra("sensorData", data);
 
                     Log.i(TAG, "Sending broadcast for " + id);

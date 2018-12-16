@@ -2,7 +2,6 @@ package mupro.hcm.sonification.dataset;
 
 import android.app.Application;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 
 import java.util.List;
 

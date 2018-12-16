@@ -1,14 +1,11 @@
 package mupro.hcm.sonification.database;
 
 
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 
-
 import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;

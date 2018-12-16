@@ -4,8 +4,6 @@ package mupro.hcm.sonification.database;
 import android.content.Context;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.room.Database;
 import androidx.room.Room;

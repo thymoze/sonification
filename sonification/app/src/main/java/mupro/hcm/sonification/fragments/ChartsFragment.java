@@ -1,9 +1,7 @@
 package mupro.hcm.sonification.fragments;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +13,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -30,9 +26,6 @@ import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
-import mupro.hcm.sonification.sensors.SensorDataReceiver;
-
-import static mupro.hcm.sonification.NavbarActivity.BROADCAST_ACTION;
 
 public class ChartsFragment extends Fragment {
 
@@ -102,7 +95,7 @@ public class ChartsFragment extends Fragment {
                 .parallel()
                 .sorted(Comparator.comparing(s -> s.getLocalizedName(getContext())))
                 .forEachOrdered(s -> {
-                    menu.add(Menu.NONE, s.ordinal() + 1, Menu.NONE, s.getLocalizedName(getContext()))
+                    menu.add(99, s.ordinal() + 1, Menu.NONE, s.getLocalizedName(getContext()))
                             .setCheckable(true)
                             .setChecked(mSensors.contains(s.getId()));
                 });
@@ -112,27 +105,27 @@ public class ChartsFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO: Check that the menuitem isnt the back button
-        String id = Sensor.values()[item.getItemId() - 1].getId();
+        if (item.getGroupId() == 99) {
+            String id = Sensor.values()[item.getItemId() - 1].getId();
 
-        if (item.isChecked()) {
-            item.setChecked(false);
-            mSensors.remove(id);
-        } else {
-            item.setChecked(true);
-            mSensors.add(id);
+            if (item.isChecked()) {
+                item.setChecked(false);
+                mSensors.remove(id);
+            } else {
+                item.setChecked(true);
+                mSensors.add(id);
+            }
+            //new FragmentLoader(this).execute();
+            updateFragments();
+
+            no_charts_text.setVisibility(mSensors.isEmpty() ? View.VISIBLE : View.GONE);
+
+            sharedPreferences.edit()
+                    .putStringSet("CHART_LIST", mSensors)
+                    .apply();
         }
-        //new FragmentLoader(this).execute();
-        updateFragments();
 
-        no_charts_text.setVisibility(mSensors.isEmpty() ? View.VISIBLE : View.GONE);
-
-        sharedPreferences.edit()
-                .putStringSet("CHART_LIST", mSensors)
-                .apply();
-
-
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateFragments() {
