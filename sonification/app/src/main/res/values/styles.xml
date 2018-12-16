@@ -19,5 +19,9 @@
         <item name="colorOnError">@color/on_error</item>
 
         <item name="android:statusBarColor">@color/on_primary</item>
+
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_image_transform</item>
     </style>
 </resources>

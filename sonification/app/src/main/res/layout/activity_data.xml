@@ -14,9 +14,17 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/data_activity_toolbar"
-            app:title="@string/app_name"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                android:id="@+id/data_activity_toolbar_title"
+                android:transitionName="dataset_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"/>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/data_activity_tablayout"

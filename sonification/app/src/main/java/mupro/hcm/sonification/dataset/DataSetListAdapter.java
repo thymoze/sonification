@@ -1,5 +1,6 @@
 package mupro.hcm.sonification.dataset;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.DataActivity;
+import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.DataSet;
 
@@ -23,11 +25,11 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
 
     private static final String TAG = DataSetListAdapter.class.getName();
 
-    private Context mContext;
+    private MainActivity mContext;
     // Cached copy of DataSets
     private List<DataSet> mDataSets;
 
-    public DataSetListAdapter(Context context) {
+    public DataSetListAdapter(MainActivity context) {
         mContext = context;
     }
 
@@ -52,7 +54,8 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
                 intent.putExtra("DATASET_ID", current.getId());
-                mContext.startActivity(intent);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(mContext, viewHolder.title, "dataset_title");
+                mContext.startActivity(intent, options.toBundle());
             });
         } else {
             viewHolder.title.setText("~");

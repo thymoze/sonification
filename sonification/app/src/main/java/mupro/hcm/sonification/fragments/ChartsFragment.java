@@ -41,6 +41,7 @@ public class ChartsFragment extends Fragment {
 
     private TreeSet<String> mSensors;
     private long mDataSetId;
+    private int initCounter;
 
     public ChartsFragment() {
     }
@@ -69,6 +70,17 @@ public class ChartsFragment extends Fragment {
                                                              .collect(Collectors.toSet())));
 
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void startPostponedEnterTransition() {
+        if (++initCounter == mSensors.size()) {
+            Log.i(TAG, "Starting postponed enter transition");
+            getActivity().startPostponedEnterTransition();
+            super.startPostponedEnterTransition();
+        } else {
+            Log.i(TAG, "loadFromDb " + initCounter + " finished");
+        }
     }
 
     @Override
@@ -130,7 +142,7 @@ public class ChartsFragment extends Fragment {
 
     private void updateFragments() {
         for (Sensor sensor : Sensor.values()) {
-            Fragment f = getFragmentManager().findFragmentByTag(sensor.getId());
+            Fragment f = getChildFragmentManager().findFragmentByTag(sensor.getId());
             if (f != null) {
                 getFragmentManager().beginTransaction().remove(f).commit();
             }
@@ -139,8 +151,9 @@ public class ChartsFragment extends Fragment {
         mSensors.parallelStream()
                 .sorted(Comparator.comparing(s -> Sensor.fromId(s).getLocalizedName(getContext())))
                 .forEachOrdered(s -> {
-                    FragmentTransaction transaction = requireFragmentManager().beginTransaction();
-                    transaction.add(R.id.charts_container, ChartCardFragment.newInstance(s, mDataSetId), s);
+                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                    ChartCardFragment fragment = ChartCardFragment.newInstance(s, mDataSetId);
+                    transaction.add(R.id.charts_container, fragment, s);
                     transaction.commit();
                 });
     }

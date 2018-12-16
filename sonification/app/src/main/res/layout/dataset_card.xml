@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/on_surface"
             android:textSize="24sp"
+            android:transitionName="dataset_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

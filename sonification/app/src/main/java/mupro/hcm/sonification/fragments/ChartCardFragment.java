@@ -26,6 +26,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
@@ -98,9 +100,9 @@ public class ChartCardFragment extends Fragment {
     public String getSensorId() {
         return mSensorId;
     }
-    
-    private void loadFromDb() {
-        new loadFromDbTask(this).execute(new Pair<>(mSensorId, mDataSetId));
+
+    public void loadFromDb() {
+        new loadFromDbTask(this).execute(Pair.create(mSensorId, mDataSetId));
     }
 
     // -------------------------------------
@@ -245,6 +247,11 @@ public class ChartCardFragment extends Fragment {
             ChartCardFragment fragment = mContext.get();
             if (fragment != null)
                 fragment.addEntryToChart(values[0].first, values[0].second.floatValue());
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mContext.get().getParentFragment().startPostponedEnterTransition();
         }
     }
 }

@@ -5,6 +5,8 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.LiveData;
@@ -36,6 +39,8 @@ public class DataActivity extends AppCompatActivity {
 
     @BindView(R.id.data_activity_toolbar)
     Toolbar toolbar;
+    @BindView(R.id.data_activity_toolbar_title)
+    TextView toolbarTitle;
     @BindView(R.id.data_activity_appbar)
     AppBarLayout appBarLayout;
     @BindView(R.id.data_activity_tablayout)
@@ -56,14 +61,17 @@ public class DataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_data);
         ButterKnife.bind(this);
 
+        postponeEnterTransition();
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         Intent intent = getIntent();
         AsyncTask.execute(() -> {
             mDataSet = AppDatabase.getDatabase(this).dataSetDao()
                     .getById(intent.getLongExtra("DATASET_ID", -1));
-            toolbar.setTitle(mDataSet.getName());
+            toolbarTitle.setText(mDataSet.getName());
         });
 
         tabLayout.setupWithViewPager(viewPager);
@@ -109,6 +117,17 @@ public class DataActivity extends AppCompatActivity {
 
         if (mDataSet.getId() == currDataSetId) {
             registerReceivers();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finishAfterTransition();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
