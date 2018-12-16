@@ -4,6 +4,7 @@
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
 
+    <string name="stop">Stop</string>
     <string name="poweroff">Herunterfahren</string>
     <string name="settings">Settings</string>
 
@@ -14,7 +15,6 @@
 
     <!-- Home -->
     <string name="btn_start">Start</string>
-    <string name="btn_stop">Stop</string>
     <!-- TODO: remove later -->
     <string name="warning">Achtung! Bitte überprüfe immer, dass tatsächlich Werte ankommen (warte, bis der erste Toast erscheint). Wenn innerhalb von circa einer halben Minute nichts passiert, kann es sein, dass der Port noch nicht freigegeben war, dann einfach stoppen und nochmal starten.</string>
 

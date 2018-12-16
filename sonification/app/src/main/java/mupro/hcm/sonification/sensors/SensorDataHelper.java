@@ -1,9 +1,9 @@
 package mupro.hcm.sonification.sensors;
+
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import mupro.hcm.sonification.database.SensorData;
 

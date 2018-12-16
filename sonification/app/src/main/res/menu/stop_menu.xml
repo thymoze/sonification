@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/shutdown"
-        android:icon="@drawable/ic_power_white_24dp"
-        android:title="@string/poweroff"
+        android:id="@+id/stop"
+        android:icon="@drawable/ic_stop_black_24dp"
+        android:title="@string/stop"
         app:showAsAction="ifRoom" />
+
 </menu>

@@ -3,7 +3,6 @@ package mupro.hcm.sonification.database;
 
 import java.time.Instant;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;

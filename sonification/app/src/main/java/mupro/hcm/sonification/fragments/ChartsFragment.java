@@ -1,9 +1,7 @@
 package mupro.hcm.sonification.fragments;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +13,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -30,9 +26,6 @@ import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
-import mupro.hcm.sonification.sensors.SensorDataReceiver;
-
-import static mupro.hcm.sonification.NavbarActivity.BROADCAST_ACTION;
 
 public class ChartsFragment extends Fragment {
 
