@@ -72,6 +72,13 @@ public class DataActivity extends AppCompatActivity {
             mDataSet = AppDatabase.getDatabase(this).dataSetDao()
                     .getById(intent.getLongExtra("DATASET_ID", -1));
             toolbarTitle.setText(mDataSet.getName());
+
+            long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
+                    .getLong(CURRENT_DATASET, -1);
+
+            if (mDataSet.getId() == currDataSetId) {
+                registerReceiver();
+            }
         });
 
         tabLayout.setupWithViewPager(viewPager);
@@ -109,18 +116,6 @@ public class DataActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
-                .getLong(CURRENT_DATASET, -1);
-
-        if (mDataSet.getId() == currDataSetId) {
-            registerReceivers();
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -140,7 +135,7 @@ public class DataActivity extends AppCompatActivity {
         }
     }
 
-    private void registerReceivers() {
+    private void registerReceiver() {
         mSensorDataReceiver = new SensorDataReceiver(this::receivedData);
         IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
         registerReceiver(mSensorDataReceiver, intentFilter);
