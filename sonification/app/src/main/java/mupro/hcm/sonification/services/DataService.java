@@ -22,6 +22,7 @@ import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.location.FusedLocationProvider;
+import mupro.hcm.sonification.utils.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
@@ -43,6 +44,14 @@ public class DataService extends Service {
         super.onCreate();
         startForeground(FOREGROUND_ID, buildForegroundNotification());
         Log.i(TAG, "onCreate");
+
+        // TODO: remove this test
+        SoundQueue queue = new SoundQueue(this);
+        queue.playSound("sounds/sax-up.mp3");
+        queue.playSound("sounds/ball-up.mp3");
+        queue.playSound("sounds/bass-down.mp3");
+        queue.playSound("sounds/sakura-down.mp3");
+
         startReceivingData();
     }
 
