@@ -1,81 +1,57 @@
 package mupro.hcm.sonification.database;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
-import java.util.Optional;
 
-import static mupro.hcm.sonification.helpers.SensorDataHelper.*;
+import androidx.annotation.Nullable;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+import mupro.hcm.sonification.sensors.Sensor;
 
-@Entity
+import static androidx.room.ForeignKey.CASCADE;
+
+@Entity(foreignKeys = @ForeignKey(entity = DataSet.class,
+        parentColumns = "id",
+        childColumns = "dataSetId",
+        onDelete = CASCADE))
 public class SensorData implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
+    private long dataSetId;
 
-    @ColumnInfo(name = "pm10")
     private double pm10;
-
-    @ColumnInfo(name = "pm25")
     private double pm25;
-
-    @ColumnInfo(name = "humidity")
     private double humidity;
-
-    @ColumnInfo(name = "temperatureSHT")
     private double temperatureSHT;
-
-    @ColumnInfo(name = "pressure")
     private double pressure;
-
-    @ColumnInfo(name = "temperatureBMP")
     private double temperatureBMP;
-
-    @ColumnInfo(name = "co")
     private double co;
-
-    @ColumnInfo(name = "no2")
     private double no2;
-
-    @ColumnInfo(name = "nh3")
     private double nh3;
-
-    @ColumnInfo(name = "c3h8")
     private double c3h8;
-
-    @ColumnInfo(name = "c4h10")
     private double c4h10;
-
-    @ColumnInfo(name = "ch4")
     private double ch4;
-
-    @ColumnInfo(name = "h2")
     private double h2;
-
-    @ColumnInfo(name = "c2h5oh")
     private double c2h5oh;
-
-    @ColumnInfo(name = "longitude")
     private double longitude;
-
-    @ColumnInfo(name = "latitude")
     private double latitude;
 
-    @ColumnInfo(name = "timestamp")
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
 
-    public Double get(Sensors s) {
-        switch (s) {
-            case PM25: return getPm25();
-            case PM10: return getPm10();
+    public @Nullable Double get(Sensor sensor) {
+        String id = sensor.getId();
+        try {
+            // call getSensorId by reflection
+            return (Double) SensorData.class.getMethod("get" + id.substring(0, 1).toUpperCase() + id.substring(1)).invoke(this);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            return null;
         }
-        return null;
     }
 
     public long getId() {
@@ -84,6 +60,14 @@ public class SensorData implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getDataSetId() {
+        return dataSetId;
+    }
+
+    public void setDataSetId(long dataSetId) {
+        this.dataSetId = dataSetId;
     }
 
     public double getPm10() {
@@ -220,5 +204,22 @@ public class SensorData implements Serializable {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String toString() {
+        return "Time: \t" + getTimestamp() + "\n" +
+                "Lat: \t" + getLatitude() + "\n" +
+                "Long: \t" + getLongitude() + "\n" +
+                "PM10: \t" + getPm10() + "\n" +
+                "PM2.5: \t" + getPm25() + "\n" +
+                "Humidity: \t" + getHumidity() + "\n" +
+                "Temperature: \t" + getTemperatureSHT() + "\n" +
+                "CO: \t" + getCo() + "\n" +
+                "NO2: \t" + getNo2() + "\n" +
+                "NH3: \t" + getNh3() + "\n" +
+                "C3H8: \t" + getC3h8() + "\n" +
+                "C4H10: \t" + getC4h10() + "\n" +
+                "H2: \t" + getH2() + "\n" +
+                "C2H5OH: \t" + getC2h5oh() + "\n";
     }
 }

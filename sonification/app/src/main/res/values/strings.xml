@@ -4,18 +4,35 @@
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
 
+    <string name="stop">Stop</string>
+    <string name="poweroff">Herunterfahren</string>
+    <string name="settings">Settings</string>
+
+    <string name="new_dataset">Neuer Datensatz</string>
+    <string name="enter_name">Bitte geben Sie einen Namen ein.</string>
+    <string name="add">Hinzufügen</string>
+    <string name="abort">Abbrechen</string>
+
+    <!-- Home -->
+    <string name="btn_start">Start</string>
+    <!-- TODO: remove later -->
+    <string name="warning">Achtung! Bitte überprüfe immer, dass tatsächlich Werte ankommen (warte, bis der erste Toast erscheint). Wenn innerhalb von circa einer halben Minute nichts passiert, kann es sein, dass der Port noch nicht freigegeben war, dann einfach stoppen und nochmal starten.</string>
+
     <!-- Charts -->
+    <string name="no_charts">Keine Charts aktiviert.</string>
+
     <string name="pm25">Feinstaub 2.5</string>
     <string name="pm10">Feinstaub 10</string>
     <string name="co">Kohlenmonoxid</string>
     <string name="nh3">Ammoniak</string>
     <string name="no2">Stickstoffdioxid</string>
-    <string name="ethanol">Ethanol</string>
+    <string name="c2h5oh">Ethanol</string>
     <string name="h2">Wasserstoff</string>
+    <string name="c4h10">Isobutan</string>
     <string name="ch4">Methan</string>
-    <string name="propan">Propan</string>
-    <string name="isobutan">Isobutan</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="c3h8">Propan</string>
+    <string name="humidity">Luftfeuchtigkeit</string>
+    <string name="pressure">Luftdruck</string>
+    <string name="temperatureSHT">Temperatur (SHT)</string>
+    <string name="temperatureBMP">Temperatur (BMP)</string>
 </resources>

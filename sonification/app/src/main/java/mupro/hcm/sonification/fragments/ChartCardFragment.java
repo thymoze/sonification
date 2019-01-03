@@ -1,12 +1,10 @@
 package mupro.hcm.sonification.fragments;
 
+
 import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,43 +18,45 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import org.w3c.dom.Text;
-
+import java.lang.ref.WeakReference;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
-import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.database.SensorDataDao;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
-
-import static mupro.hcm.sonification.helpers.SensorDataHelper.Sensors;
-
+import mupro.hcm.sonification.sensors.Sensor;
 
 public class ChartCardFragment extends Fragment {
-    private static final String TAG = "ChartCardFragment";
-    private static final String ARG_SENSOR_NAME = "_sensor_name";
+    private static final String TAG = ChartCardFragment.class.getName();
+    private static final String ARG_SENSOR_ID = TAG.concat("sensor_name");
+    private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
 
-    private Sensors sensor;
+    @BindView(R.id.chart)
+    LineChart chart;
+    @BindView(R.id.label)
+    TextView label;
 
-    @BindView(R.id.chart) LineChart chart;
-    @BindView(R.id.label) TextView label;
+    private String mSensorId;
+    private long mDataSetId;
 
     public ChartCardFragment() {}
 
-    public static ChartCardFragment newInstance(Sensors sensor) {
+    public static ChartCardFragment newInstance(String sensor, long dataSetId) {
         ChartCardFragment fragment = new ChartCardFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SENSOR_NAME, sensor.getId());
+        args.putString(ARG_SENSOR_ID, sensor);
+        args.putLong(ARG_DATASET_ID, dataSetId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,7 +65,8 @@ public class ChartCardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            sensor = Sensors.fromId(getArguments().getString(ARG_SENSOR_NAME)).get();
+            mSensorId = getArguments().getString(ARG_SENSOR_ID);
+            mDataSetId = getArguments().getLong(ARG_DATASET_ID);
         }
     }
 
@@ -75,7 +76,7 @@ public class ChartCardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chart_card, container, false);
         ButterKnife.bind(this, view);
 
-        label.setText(sensor.getLocalizedName(getContext()));
+        label.setText(Sensor.fromId(mSensorId).getLocalizedName(getContext()));
         initChart();
         loadFromDb();
 
@@ -92,10 +93,16 @@ public class ChartCardFragment extends Fragment {
         super.onDetach();
     }
 
-    private void loadFromDb() {
-        List<SensorData> last30 = AppDatabase.getDatabase(getContext()).sensorDataDao().getAll();
-        for (SensorData data : last30)
-            addEntryToChart((float) data.getId(), data.get(sensor).floatValue());
+    public long getDataSetId() {
+        return mDataSetId;
+    }
+
+    public String getSensorId() {
+        return mSensorId;
+    }
+
+    public void loadFromDb() {
+        new loadFromDbTask(this).execute(Pair.create(mSensorId, mDataSetId));
     }
 
     // -------------------------------------
@@ -122,14 +129,15 @@ public class ChartCardFragment extends Fragment {
         chart.getLegend().setEnabled(false);
 
 
-        IAxisValueFormatter xAxisFormatter = (value, axis) -> {
-            Instant ts = AppDatabase.getDatabase(getContext()).sensorDataDao().getTimestampById((int) value - 1);
-            if (ts == null) {
-                Log.w(TAG, "Timestamp is null");
-                return "";
-            } else {
-                ZonedDateTime z = ZonedDateTime.ofInstant(ts, ZoneId.systemDefault());
-                return z.format(DateTimeFormatter.ofPattern("dd/MM HH:mm"));
+        IAxisValueFormatter xAxisFormatter = new IAxisValueFormatter() {
+            private DateTimeFormatter mFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                int bits = Float.floatToIntBits(value);
+                Instant time = Instant.ofEpochSecond(bits);
+                ZonedDateTime z = ZonedDateTime.ofInstant(time, ZoneId.systemDefault());
+                return mFormat.format(z);
             }
         };
 
@@ -146,14 +154,14 @@ public class ChartCardFragment extends Fragment {
         y.setTextColor(Color.BLACK);
         y.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         y.setDrawAxisLine(false);
-        y.setAxisMinimum(-5);
-        y.setAxisMaximum(5);
+        //y.setAxisMinimum(-5);
+        //y.setAxisMaximum(5);
 
         chart.getAxisRight().setEnabled(false);
     }
 
     private LineDataSet createSet(LineChart chart) {
-        LineDataSet set = new LineDataSet(null, sensor.getLocalizedName(getContext()));
+        LineDataSet set = new LineDataSet(null, Sensor.fromId(mSensorId).getLocalizedName(getContext()));
         set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         set.setCubicIntensity(0.2f);
         set.setDrawFilled(true);
@@ -172,7 +180,7 @@ public class ChartCardFragment extends Fragment {
         return set;
     }
 
-    public void addEntryToChart(float x, float y) {
+    public void addEntryToChart(Instant x, float y) {
         LineData data = chart.getData();
 
         if (data == null) {
@@ -180,7 +188,7 @@ public class ChartCardFragment extends Fragment {
             chart.setData(data);
         }
 
-        ILineDataSet set = data.getDataSetByIndex(0);
+        LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
         // set.addEntry(...); // can be called as well
 
         if (set == null) {
@@ -188,7 +196,8 @@ public class ChartCardFragment extends Fragment {
             data.addDataSet(set);
         }
 
-        data.addEntry(new Entry(x, y), 0);
+        float xx = Float.intBitsToFloat((int) x.getEpochSecond());
+        data.addEntry(new Entry(xx, y), 0);
         data.notifyDataChanged();
 
         // let the chart know it's data has changed
@@ -198,11 +207,51 @@ public class ChartCardFragment extends Fragment {
         //chart.setVisibleYRangeMaximum(15, AxisDependency.LEFT);
 
         // this automatically refreshes the chart (calls invalidate())
-        int offset = set.getEntryCount() - 7;
-        if (offset < 0) offset = 0;
-        float xx = set.getEntryForIndex(offset).getX();
-        Log.i(TAG, String.format("%f, %d, %f", x, offset, xx));
-        chart.moveViewTo(xx, 0f, YAxis.AxisDependency.LEFT);
+        if (set.getEntryCount() >= 20 && false) {
+            int offset = set.getEntryCount() - 20;
+            float offsetX = set.getEntryForIndex(offset).getX();
+            chart.setVisibleXRangeMaximum(20);
+            chart.moveViewToX(offsetX);
+            chart.setVisibleXRangeMaximum(set.getEntryCount());
+        } else {
+            chart.invalidate();
+        }
     }
 
+    private static class loadFromDbTask extends AsyncTask<Pair<String, Long>, Pair<Instant, Double>, Void> {
+
+        private SensorDataDao mSensorDataDao;
+        private WeakReference<ChartCardFragment> mContext;
+
+        loadFromDbTask(ChartCardFragment context) {
+            mContext = new WeakReference<>(context);
+            mSensorDataDao = AppDatabase.getDatabase(context.getContext()).sensorDataDao();
+        }
+
+        @Override
+        protected Void doInBackground(Pair<String, Long>... pairs) {
+            List<Double> sensorData = mSensorDataDao.getSensorForDataSet(Sensor.fromId(pairs[0].first), pairs[0].second);
+            List<Instant> timeData = mSensorDataDao.getTimestampForDataSet(pairs[0].second);
+
+            if (sensorData.size() == timeData.size()) {
+                for (int i = 0; i < sensorData.size(); i++) {
+                    publishProgress(new Pair<>(timeData.get(i), sensorData.get(i)));
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Pair<Instant, Double>... values) {
+            ChartCardFragment fragment = mContext.get();
+            if (fragment != null)
+                fragment.addEntryToChart(values[0].first, values[0].second.floatValue());
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mContext.get().getParentFragment().startPostponedEnterTransition();
+        }
+    }
 }

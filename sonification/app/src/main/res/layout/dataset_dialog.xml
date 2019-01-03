@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundColor="@color/surface"
+        app:hintTextColor="@color/on_primary"
+        app:helperTextTextColor="@color/on_primary"
+        app:counterTextColor="@color/on_primary"
+        app:boxStrokeColor="@color/on_surface_light"
+        app:errorTextColor="@color/error"
+        app:errorEnabled="true"
+        android:hint="Name:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:textCursorDrawable="@drawable/black_cursor"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+</FrameLayout>

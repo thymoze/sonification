@@ -14,11 +14,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.time.Instant;
 
-import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.fragments.MapFragment;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
-import mupro.hcm.sonification.helpers.SensorDataHelper;
+import mupro.hcm.sonification.sensors.SensorDataHelper;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -26,7 +23,7 @@ import mupro.hcm.sonification.helpers.SensorDataHelper;
  */
 public class UdpService extends IntentService {
 
-    private static final String TAG = "UdpService";
+    private static final String TAG = UdpService.class.getName();
     private static final int PORT = 7777;
     private ResultReceiver receiver;
 
@@ -59,9 +56,12 @@ public class UdpService extends IntentService {
         try (DatagramSocket ds = new DatagramSocket(PORT)) {
             Log.i(TAG, "Listening on port " + PORT);
             while (running) {
+                //TODO: handle the "port already in use" error (maybe intent service to disable button on HomeFragment?)
                 ds.receive(dp);
-                Log.i(TAG, "Received object.");
+                if (!running)
+                    break;
 
+                Log.i(TAG, "Received object.");
                 try {
                     JSONObject data = new JSONObject(new String(msg, 0, dp.getLength()));
                     SensorData sensorData = SensorDataHelper.createSensorDataObjectFromValues(data);
@@ -77,12 +77,21 @@ public class UdpService extends IntentService {
     }
 
     private void returnData(SensorData data) {
-        if (data != null) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("sensorData", data);
-            receiver.send(LOCATION_SUCCESS, bundle);
-        } else {
-            receiver.send(LOCATION_ERROR, Bundle.EMPTY);
+        if (receiver != null) {
+            if (data != null) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("sensorData", data);
+                receiver.send(LOCATION_SUCCESS, bundle);
+            } else {
+                receiver.send(LOCATION_ERROR, Bundle.EMPTY);
+            }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.running = false;
+        this.receiver = null;
     }
 }

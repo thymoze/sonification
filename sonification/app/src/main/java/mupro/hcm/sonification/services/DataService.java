@@ -5,39 +5,53 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.helpers.FusedLocationProvider;
+import mupro.hcm.sonification.location.FusedLocationProvider;
+import mupro.hcm.sonification.utils.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 
 public class DataService extends Service {
 
     private final String TAG = "DataService";
 
     // needed for notification
-    NotificationManager notificationManager;
+    private NotificationManager notificationManager;
     private static String CHANNEL_ID = "1338";
     private static int FOREGROUND_ID = 1337;
     private String notificationTitle = "Sonification";
     private UdpDataReceiver udpDataReceiver;
+    private boolean receiving = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         startForeground(FOREGROUND_ID, buildForegroundNotification());
         Log.i(TAG, "onCreate");
+
+        // TODO: remove this test
+        SoundQueue queue = new SoundQueue(this);
+        queue.playSound("sounds/sax-up.mp3");
+        queue.playSound("sounds/ball-up.mp3");
+        queue.playSound("sounds/bass-down.mp3");
+        queue.playSound("sounds/sakura-down.mp3");
+
         startReceivingData();
     }
 
@@ -46,13 +60,23 @@ public class DataService extends Service {
         Intent intent = new Intent(DataService.this, UdpService.class);
         intent.putExtra("receiver", udpDataReceiver);
         startService(intent);
+        receiving = true;
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
-        if (sensorData != null)
-            return AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
-        else
-            return -1;
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        long id = sharedPreferences.getLong(CURRENT_DATASET, -1);
+
+        Log.i(TAG, "Saving to database...");
+        if (id != -1) {
+            if (sensorData != null) {
+                sensorData.setDataSetId(id);
+                long sensorId = AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
+                Log.i(TAG, "Saved " + sensorId + " to database...");
+                return sensorId;
+            }
+        }
+        return -1;
     }
 
     private Notification buildForegroundNotification() {
@@ -67,7 +91,7 @@ public class DataService extends Service {
                 .setSmallIcon(R.drawable.common_full_open_on_phone)
                 .setContentTitle(notificationTitle)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("The Sonification App is currently running in the background and tracking your position."))
+                        .bigText("The Sonification App is currently receiving in the background and tracking your position."))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent);
 
@@ -83,8 +107,6 @@ public class DataService extends Service {
 
     private class UdpDataReceiver extends ResultReceiver {
 
-        private static final String TAG = "LocationReceiver";
-
         UdpDataReceiver(Handler handler) {
             super(handler);
         }
@@ -94,28 +116,51 @@ public class DataService extends Service {
             SensorData data = ((SensorData) resultData.getSerializable("sensorData"));
             Log.i(TAG, "Received: " + data.getTimestamp());
 
+
+            Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
             FusedLocationProvider.requestSingleUpdate(DataService.this, (callback -> {
-                Log.i(TAG, "Got location");
+                Toast.makeText(DataService.this, "Location received!", Toast.LENGTH_SHORT).show();
+
+                if (!receiving)
+                    return;
 
                 data.setLatitude(callback.latitude);
                 data.setLongitude(callback.longitude);
 
-                long id = saveDataToDatabase(data);
-                data.setId(id);
+                AsyncTask.execute(() -> {
+                    long id = saveDataToDatabase(data);
+                    data.setId(id);
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MainActivity.BROADCAST_ACTION);
-                broadcastIntent.putExtra("sensorData", data);
+                    Intent broadcastIntent = new Intent();
+                    broadcastIntent.setAction(BROADCAST_ACTION);
+                    broadcastIntent.putExtra("sensorData", data);
 
-                sendBroadcast(broadcastIntent);
+                    Log.i(TAG, "Sending broadcast for " + id);
+                    sendBroadcast(broadcastIntent);
+                });
+
             }));
-
-            super.onReceiveResult(resultCode, resultData);
         }
     }
 
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopForeground(true);
+        stopReceivingData();
+        Log.i(TAG, "onDestroy");
+    }
+
+    public void stopReceivingData() {
+        this.udpDataReceiver = null;
+        this.notificationManager = null;
+        Intent intent = new Intent(DataService.this, UdpService.class);
+        stopService(intent);
+        receiving = false;
     }
 }
 
