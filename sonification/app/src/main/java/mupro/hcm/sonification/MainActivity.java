@@ -60,6 +60,7 @@ import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.DataSetDao;
 import mupro.hcm.sonification.dataset.DataSetListAdapter;
 import mupro.hcm.sonification.dataset.DataSetViewModel;
+import mupro.hcm.sonification.preferences.PreferencesActivity;
 import mupro.hcm.sonification.services.DataService;
 
 public class MainActivity extends AppCompatActivity {
@@ -147,17 +148,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getSharedPreferences("DATA", MODE_PRIVATE)
                 .getLong(CURRENT_DATASET, -1) != -1) {
             getMenuInflater().inflate(R.menu.stop_menu, menu);
         }
+
+        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.settings);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -168,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.stop:
                 stopDataService();
                 return true;
+            case 0:
+                Intent intent = new Intent(this, PreferencesActivity.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -188,9 +188,6 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.setOnShowListener(dia -> {
             Button button_pos = ((AlertDialog) dia).getButton(AlertDialog.BUTTON_POSITIVE);
-            Button button_neg = ((AlertDialog) dia).getButton(AlertDialog.BUTTON_NEGATIVE);
-            button_pos.setTextColor(Color.parseColor("#3B3B3B"));
-            button_neg.setTextColor(Color.parseColor("#3B3B3B"));
             button_pos.setOnClickListener(v -> {
                 String name = input.getText().toString();
                 if (!name.isEmpty()) {

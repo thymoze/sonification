@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:key="service_preference"
+        android:entries="@array/services"
+        android:entryValues="@array/services"
+        app:title="Background service type" />
+
+    <PreferenceCategory
+        app:key="charts_category"
+        app:title="@string/title_charts">
+
+        <Preference
+            app:title="@string/title_charts"
+            app:summary="Select which different charts to display"
+            app:fragment="mupro.hcm.sonification.preferences.ChartsPreferencesFragment" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

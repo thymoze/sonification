@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/title_charts">
+
+    <SwitchPreference
+        android:key="chart_pm10"
+        android:title="@string/pm10" />
+
+    <SwitchPreference
+        android:key="pm25"
+        android:title="@string/pm25" />
+
+</PreferenceScreen>

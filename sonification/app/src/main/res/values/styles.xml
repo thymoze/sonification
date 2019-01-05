@@ -18,10 +18,20 @@
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/on_error</item>
 
+        <item name="android:textColorPrimary">@color/on_primary</item>
+        <item name="android:textColorSecondary">@color/on_surface_light</item>
         <item name="android:statusBarColor">@color/on_primary</item>
+        <item name="textColorAlertDialogListItem">@color/on_primary</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
 
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform</item>
         <item name="android:windowSharedElementExitTransition">@transition/change_image_transform</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/secondary</item>
+        <item name="colorAccent">@color/secondary</item>
+        <item name="android:textColor">@color/on_primary</item>
     </style>
 </resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="services">
+        <item>MQTT</item>
+        <item>UDP</item>
+    </string-array>
+
+    <string-array name="charts">
+        <item>PM10</item>
+        <item>PM25</item>
+    </string-array>
+</resources>
