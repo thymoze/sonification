@@ -6,7 +6,7 @@
 
     <string name="stop">Stop</string>
     <string name="poweroff">Herunterfahren</string>
-    <string name="settings">Settings</string>
+    <string name="settings">Einstellungen</string>
 
     <string name="new_dataset">Neuer Datensatz</string>
     <string name="enter_name">Bitte geben Sie einen Namen ein.</string>

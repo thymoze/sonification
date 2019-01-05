@@ -32,7 +32,6 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
                 .beginTransaction()
                 .replace(R.id.preferences_container, new PreferencesFragment())
                 .commit();
-
     }
 
     @Override
@@ -63,5 +62,9 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 }

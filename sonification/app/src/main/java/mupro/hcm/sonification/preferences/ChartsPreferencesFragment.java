@@ -11,4 +11,10 @@ public class ChartsPreferencesFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences_charts, rootKey);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((PreferencesActivity) getActivity()).setActionBarTitle(getResources().getString(R.string.title_charts));
+    }
 }
