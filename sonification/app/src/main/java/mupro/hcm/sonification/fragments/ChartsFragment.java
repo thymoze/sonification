@@ -69,7 +69,7 @@ public class ChartsFragment extends Fragment {
                                                              .map(Sensor::getId)
                                                              .collect(Collectors.toSet())));
 
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
     }
 
     @Override

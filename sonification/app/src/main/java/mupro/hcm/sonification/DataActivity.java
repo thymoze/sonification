@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.preferences.PreferencesActivity;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
@@ -116,11 +118,20 @@ public class DataActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.settings);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finishAfterTransition();
                 return true;
+            case 0:
+                Intent intent = new Intent(this, PreferencesActivity.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
