@@ -3,6 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_charts">Charts</string>
     <string name="title_map">Map</string>
+    <string name="title_sounds">Sounds</string>
 
     <string name="stop">Stop</string>
     <string name="poweroff">Herunterfahren</string>
@@ -21,6 +22,7 @@
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>
 
+    <string name="pm">Feinstaub (kombiniert)</string>
     <string name="pm25">Feinstaub 2.5</string>
     <string name="pm10">Feinstaub 10</string>
     <string name="co">Kohlenmonoxid</string>
@@ -35,4 +37,13 @@
     <string name="pressure">Luftdruck</string>
     <string name="temperatureSHT">Temperatur (SHT)</string>
     <string name="temperatureBMP">Temperatur (BMP)</string>
+
+    <string name="bass">Bass</string>
+    <string name="bell"> Bell</string>
+    <string name="bow">Bow</string>
+    <string name="harp">Harp</string>
+    <string name="piano">Piano</string>
+    <string name="sakura">Sakura</string>
+    <string name="sax">Sax</string>
+    <string name="violin">Violin</string>
 </resources>
