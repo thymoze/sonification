@@ -119,7 +119,7 @@ public class DataActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.settings);
+        menu.add(Menu.NONE, R.id.settings, Menu.NONE, R.string.settings);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -129,7 +129,7 @@ public class DataActivity extends AppCompatActivity {
             case android.R.id.home:
                 finishAfterTransition();
                 return true;
-            case 0:
+            case R.id.settings:
                 Intent intent = new Intent(this, PreferencesActivity.class);
                 startActivity(intent);
             default:
@@ -138,8 +138,8 @@ public class DataActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
 
         if (mSensorDataReceiver != null) {
             unregisterReceiver(mSensorDataReceiver);

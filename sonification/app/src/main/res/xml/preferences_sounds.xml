@@ -9,7 +9,8 @@
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="pm_preference"
-        app:title="@string/pm" />
+        app:title="@string/pm"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/bell"
@@ -17,7 +18,8 @@
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="co_preference"
-        app:title="@string/co" />
+        app:title="@string/co"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/bow"
@@ -25,7 +27,8 @@
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="nh3_preference"
-        app:title="@string/nh3" />
+        app:title="@string/nh3"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/harp"
@@ -33,7 +36,8 @@
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="no2_preference"
-        app:title="@string/no2" />
+        app:title="@string/no2"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/piano"
@@ -41,7 +45,8 @@
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="c2h5oh_preference"
-        app:title="@string/c2h5oh" />
+        app:title="@string/c2h5oh"
+        app:iconSpaceReserved="false"/>
 
     <!--<ListPreference
         app:key="h2_preference"
@@ -56,7 +61,8 @@ android:summary="%s"/>-->
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="c4h10_preference"
-        app:title="@string/c4h10" />
+        app:title="@string/c4h10"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/sax"
@@ -64,7 +70,8 @@ android:summary="%s"/>-->
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="ch4_preference"
-        app:title="@string/ch4" />
+        app:title="@string/ch4"
+        app:iconSpaceReserved="false"/>
 
     <ListPreference
         android:defaultValue="@string/violin"
@@ -72,6 +79,7 @@ android:summary="%s"/>-->
         android:entryValues="@array/sounds"
         android:summary="%s"
         app:key="c3h8_preference"
-        app:title="@string/c3h8" />
+        app:title="@string/c3h8"
+        app:iconSpaceReserved="false"/>
 
 </PreferenceScreen>

@@ -5,11 +5,6 @@
         <item>UDP</item>
     </string-array>
 
-    <string-array name="charts">
-        <item>PM10</item>
-        <item>PM25</item>
-    </string-array>
-
     <string-array name="sounds">
         <item>Bass</item>
         <item>Bell</item>
@@ -19,22 +14,5 @@
         <item>Sakura</item>
         <item>Sax</item>
         <item>Violin</item>
-    </string-array>
-
-    <string-array name="gases">
-        <item>Feinstaub 2.5</item>
-        <item>Feinstaub 10</item>
-        <item>Kohlenmonoxid</item>
-        <item>Ammoniak</item>
-        <item>Stickstoffdioxid</item>
-        <item>Ethanol</item>
-        <item>Wasserstoff</item>
-        <item>Isobutan</item>
-        <item>Methan</item>
-        <item>Propan</item>
-        <item>Luftfeuchtigkeit</item>
-        <item>Luftdruck</item>
-        <item>Temperatur (SHT)</item>
-        <item>Temperatur (BMP)</item>
     </string-array>
 </resources>

@@ -7,28 +7,20 @@
         app:key="service_preference"
         android:entries="@array/services"
         android:entryValues="@array/services"
+        android:defaultValue="UDP"
         android:summary="%s"
-        app:title="Background service type" />
+        app:title="Background service type"
+        android:icon="@drawable/access_point"/>
 
-    <PreferenceCategory
-        app:key="charts_category"
-        app:title="@string/title_charts">
+    <MultiSelectListPreference
+        android:key="sensors_preference"
+        app:title="@string/title_charts"
+        android:icon="@drawable/ic_charts_black_24dp"
+        app:summary="Select which different charts to display" />
 
-        <Preference
-            app:title="@string/title_charts"
-            app:summary="Select which different charts to display"
-            app:fragment="mupro.hcm.sonification.preferences.ChartsPreferencesFragment" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:key="sounds_category"
-        app:title="@string/title_sounds">
-
-        <Preference
-            app:title="@string/title_sounds"
-            app:summary="Map the gases to your preferred sounds."
-            app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
-
-    </PreferenceCategory>
+    <Preference
+        app:title="@string/title_sounds"
+        android:icon="@drawable/music_note"
+        app:summary="Map the gases to your preferred sounds."
+        app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
 </PreferenceScreen>

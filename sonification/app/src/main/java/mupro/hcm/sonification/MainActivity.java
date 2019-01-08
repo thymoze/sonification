@@ -151,10 +151,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getSharedPreferences("DATA", MODE_PRIVATE)
                 .getLong(CURRENT_DATASET, -1) != -1) {
-            getMenuInflater().inflate(R.menu.stop_menu, menu);
+            menu.add(Menu.NONE, R.id.stop, Menu.NONE, R.string.stop)
+                    .setIcon(R.drawable.ic_stop_black_24dp)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
 
-        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.settings);
+        menu.add(Menu.NONE, R.id.settings, Menu.NONE, R.string.settings);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.stop:
                 stopDataService();
                 return true;
-            case 0:
+            case R.id.settings:
                 Intent intent = new Intent(this, PreferencesActivity.class);
                 startActivity(intent);
             default:
