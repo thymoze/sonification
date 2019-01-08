@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.lang.ref.WeakReference;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;
@@ -56,17 +59,11 @@ public class MapFragment extends Fragment implements
     private List<Polyline> polylines;
     private SensorData previousData;
 
-    @BindView(R.id.bottom_sheet_title)
-    TextView bottomSheetTitle;
-
-    @BindView(R.id.bottom_sheet_content)
-    TextView bottomSheetContent;
-
-    @BindView(R.id.bottom_sheet)
-    LinearLayout bottomSheet;
-
     private long mDataSetId;
     private BottomSheetBehavior mBottomSheetBehavior;
+
+    @BindView(R.id.bottom_sheet_placeholder)
+    FrameLayout bottomSheet;
 
     public MapFragment() {
     }
@@ -96,17 +93,6 @@ public class MapFragment extends Fragment implements
 
         ButterKnife.bind(this, v);
 
-        // hide bottom sheet at the start
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-        // expand bottom sheet on click, not only drag
-        bottomSheet.setOnClickListener((listener) -> {
-            if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
-
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mSupportMapFragment.getMapAsync(this);
 
@@ -130,6 +116,45 @@ public class MapFragment extends Fragment implements
 
         this.mGoogleMap = googleMap;
         initializeMarkers();
+
+        SensorData data = new SensorData();
+        data.setC2h5oh(2);
+        data.setC3h8(5);
+        data.setCo(3);
+        data.setC4h10(1);
+        data.setH2(7);
+        data.setHumidity(0.4);
+        data.setNh3(4);
+        data.setCh4(3);
+        data.setPm25(21);
+        data.setPm10(22);
+        data.setNo2(22);
+        data.setTimestamp(Instant.now());
+        data.setLatitude(48.333);
+        data.setLongitude(10.898);
+        data.setTemperatureBMP(23);
+        data.setTemperatureSHT(22);
+        addMarker(data);
+        SensorData data2 = new SensorData();
+        data2.setC2h5oh(2);
+        data2.setC3h8(5);
+        data2.setCo(3);
+        data2.setC4h10(1);
+        data2.setH2(7);
+        data2.setHumidity(0.4);
+        data2.setNh3(4);
+        data2.setCh4(3);
+        data2.setPm25(21);
+        data2.setPm10(22);
+        data2.setNo2(22);
+        data2.setTimestamp(Instant.now());
+        data2.setLatitude(48.333);
+        data2.setLongitude(10.898);
+        data2.setTemperatureBMP(23);
+        data2.setTemperatureSHT(22);
+        data2.setCo(200000);
+        data2.setLatitude(48.5);
+        addMarker(data2);
     }
 
     private void initializeMarkers() {
@@ -163,17 +188,29 @@ public class MapFragment extends Fragment implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        // displaying information in the bottom sheet
-        bottomSheetTitle.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy - hh:mm").format(LocalDateTime.ofInstant(((SensorData) marker.getTag()).getTimestamp(), ZoneOffset.UTC)));
-        bottomSheetContent.setText(((SensorData) marker.getTag()).toString());
+        // add a new bottom sheet with the marker information (replacing the previous one)
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        MapsBottomSheetFragment fragment = MapsBottomSheetFragment.newInstance(((SensorData) marker.getTag()));
+        transaction.replace(R.id.bottom_sheet_placeholder, fragment);
+        transaction.commit();
+
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        // expand bottom sheet on click, not only drag
+        bottomSheet.setOnClickListener((listener) -> {
+            if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
         return false;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
         // bottom sheet should be hidden if the map is clicked
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        if (mBottomSheetBehavior != null)
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private static class loadFromDbTask extends AsyncTask<Long, SensorData, Void> {

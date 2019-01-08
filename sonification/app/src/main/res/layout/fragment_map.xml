@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.MapFragment">
 
     <fragment
@@ -13,5 +13,11 @@
         android:layout_height="match_parent">
     </fragment>
 
-    <include layout="@layout/maps_bottom_sheet"/>
+    <FrameLayout
+        android:id="@+id/bottom_sheet_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="80dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
