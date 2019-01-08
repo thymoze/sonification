@@ -9,18 +9,18 @@
         android:entryValues="@array/services"
         android:defaultValue="UDP"
         android:summary="%s"
-        app:title="Background service type"
+        app:title="@string/background_service"
         android:icon="@drawable/access_point"/>
 
     <MultiSelectListPreference
         android:key="sensors_preference"
         app:title="@string/title_charts"
-        android:icon="@drawable/ic_charts_black_24dp"
-        app:summary="Select which different charts to display" />
+        android:summary="@string/display_charts"
+        android:icon="@drawable/ic_charts_black_24dp" />
 
     <Preference
         app:title="@string/title_sounds"
         android:icon="@drawable/music_note"
-        app:summary="Map the gases to your preferred sounds."
+        app:summary="@string/map_sensor_sound"
         app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
 </PreferenceScreen>

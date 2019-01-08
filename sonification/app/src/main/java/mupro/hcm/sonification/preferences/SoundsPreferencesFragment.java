@@ -29,9 +29,11 @@ public class SoundsPreferencesFragment extends PreferenceFragmentCompat implemen
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        ListPreference preference =  (ListPreference) findPreference(key);
-        SoundQueue queue = new SoundQueue(getContext());
-        queue.playSound(new Sound(preference.getValue(), Direction.UP));
-        queue.playSound(new Sound(preference.getValue(), Direction.DOWN));
+        ListPreference preference = (ListPreference) findPreference(key);
+        if (preference != null) {
+            SoundQueue queue = new SoundQueue(getContext());
+            queue.playSound(new Sound(preference.getValue(), Direction.UP));
+            queue.playSound(new Sound(preference.getValue(), Direction.DOWN));
+        }
     }
 }

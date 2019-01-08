@@ -14,10 +14,9 @@
     <string name="add">Hinzufügen</string>
     <string name="abort">Abbrechen</string>
 
-    <!-- Home -->
-    <string name="btn_start">Start</string>
-    <!-- TODO: remove later -->
-    <string name="warning">Achtung! Bitte überprüfe immer, dass tatsächlich Werte ankommen (warte, bis der erste Toast erscheint). Wenn innerhalb von circa einer halben Minute nichts passiert, kann es sein, dass der Port noch nicht freigegeben war, dann einfach stoppen und nochmal starten.</string>
+    <string name="background_service">Hintergrundservice</string>
+    <string name="display_charts">Anzuzeigende Charts</string>
+    <string name="map_sensor_sound">Mapping zwischen Sensoren und Sounds</string>
 
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>

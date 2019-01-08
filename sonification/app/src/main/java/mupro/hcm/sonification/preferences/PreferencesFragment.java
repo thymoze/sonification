@@ -5,7 +5,9 @@ import android.os.Bundle;
 import java.util.Arrays;
 
 import androidx.preference.MultiSelectListPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.sensors.Sensor;
 
@@ -17,7 +19,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         MultiSelectListPreference chartsPreference = findPreference("sensors_preference");
         chartsPreference.setEntries(Arrays.stream(Sensor.values()).map(s -> s.getLocalizedName(getContext())).toArray(CharSequence[]::new));
         chartsPreference.setEntryValues(Arrays.stream(Sensor.values()).map(Sensor::getId).toArray(CharSequence[]::new));
-
     }
 
     @Override
