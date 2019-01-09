@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String BROADCAST_ACTION = TAG.concat("broadcast_action");
     public static final String CURRENT_DATASET = "CURRENT_DATASET";
-    public static final int PENDING_REMOVAL_TIMEOUT = 3000;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -132,12 +131,11 @@ public class MainActivity extends AppCompatActivity {
             int margin = (int) getResources().getDimension(R.dimen.dataset_card_delete_margin);
 
             @Override
-            @SuppressLint("WrongConstant")
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
 
                 mItemDeletedSnackbar = Snackbar.make(dataSetList, String.format(getResources().getString(R.string.dataset_removed_message),
-                            mDataSetListAdapter.getItemName(viewHolder.getAdapterPosition())), PENDING_REMOVAL_TIMEOUT)
+                            mDataSetListAdapter.getItemName(viewHolder.getAdapterPosition())), Snackbar.LENGTH_LONG)
                         .setAction(R.string.undo, v -> mDataSetListAdapter.cancelRemoval());
 
                 mItemDeletedSnackbar.addCallback(new Snackbar.Callback() {
