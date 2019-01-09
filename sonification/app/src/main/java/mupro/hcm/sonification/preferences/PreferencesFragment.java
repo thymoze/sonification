@@ -5,9 +5,7 @@ import android.os.Bundle;
 import java.util.Arrays;
 
 import androidx.preference.MultiSelectListPreference;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.sensors.Sensor;
 

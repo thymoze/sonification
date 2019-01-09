@@ -1,24 +1,16 @@
 package mupro.hcm.sonification.dataset;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -28,10 +20,7 @@ import butterknife.ButterKnife;
 import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
-import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.DataSet;
-
-import static mupro.hcm.sonification.MainActivity.PENDING_REMOVAL_TIMEOUT;
 
 public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.ViewHolder> {
 
