@@ -34,7 +34,7 @@ public class DataService extends Service {
     private NotificationManager notificationManager;
     private static String CHANNEL_ID = "1338";
     private static int FOREGROUND_ID = 1337;
-    private String notificationTitle = "Sonification";
+
     private UdpDataReceiver udpDataReceiver;
     private boolean receiving = false;
 
@@ -81,7 +81,7 @@ public class DataService extends Service {
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .setSmallIcon(R.drawable.common_full_open_on_phone)
-                .setContentTitle(notificationTitle)
+                .setContentTitle(getResources().getString(R.string.app_name))
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("The Sonification App is currently receiving in the background and tracking your position."))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -18,6 +18,9 @@
     <string name="display_charts">Anzuzeigende Charts</string>
     <string name="map_sensor_sound">Mapping zwischen Sensoren und Sounds</string>
 
+    <string name="dataset_removed_message">Dataset %s wurde gelöscht.</string>
+    <string name="undo">Rückgängig</string>
+
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>
 

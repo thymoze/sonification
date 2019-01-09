@@ -1,12 +1,18 @@
 package mupro.hcm.sonification;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,6 +37,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -39,10 +46,12 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -70,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String BROADCAST_ACTION = TAG.concat("broadcast_action");
     public static final String CURRENT_DATASET = "CURRENT_DATASET";
+    public static final int PENDING_REMOVAL_TIMEOUT = 3000;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -83,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private DataSetListAdapter mDataSetListAdapter;
     private RecyclerView.LayoutManager mDataSetListLayoutManager;
     private DataSetViewModel mDataSetViewModel;
+    private Snackbar mItemDeletedSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,19 +103,18 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        setUpRecyclerView();
+
+        checkPermissions();
+    }
+
+    private void setUpRecyclerView() {
         dataSetList.setHasFixedSize(true);
 
         mDataSetListLayoutManager = new LinearLayoutManager(this);
         dataSetList.setLayoutManager(mDataSetListLayoutManager);
 
         mDataSetListAdapter = new DataSetListAdapter(this);
-        mDataSetListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                for (int i = positionStart; i < positionStart + itemCount; i++)
-                    mDataSetViewModel.delete(i);
-            }
-        });
         dataSetList.setAdapter(mDataSetListAdapter);
 
         mDataSetViewModel = ViewModelProviders.of(this).get(DataSetViewModel.class);
@@ -113,38 +123,93 @@ public class MainActivity extends AppCompatActivity {
         dataSetList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                int px = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12,
-                                getResources().getDisplayMetrics()));
+                int px = (int) getResources().getDimension(R.dimen.dataset_card_margin);
                 outRect.top = parent.getChildAdapterPosition(view) == 0 ? px : 0;
                 outRect.bottom = px;
             }
         });
 
-        ItemTouchHelper ith = new ItemTouchHelper(new ItemTouchHelper.Callback() {
-            @Override
-            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(0, ItemTouchHelper.START | ItemTouchHelper.END);
-            }
+        setUpItemTouchHelper();
+    }
+
+    private void setUpItemTouchHelper() {
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START | ItemTouchHelper.END) {
+            Drawable background = getDrawable(R.color.error);
+            Drawable trash = getDrawable(R.drawable.delete);
+            int margin = (int) getResources().getDimension(R.dimen.dataset_card_delete_margin);
 
             @Override
+            @SuppressLint("WrongConstant")
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                mDataSetListAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+                int position = viewHolder.getAdapterPosition();
+
+                mItemDeletedSnackbar = Snackbar.make(dataSetList, String.format(getResources().getString(R.string.dataset_removed_message),
+                            mDataSetListAdapter.getItemName(viewHolder.getAdapterPosition())), PENDING_REMOVAL_TIMEOUT)
+                        .setAction(R.string.undo, v -> mDataSetListAdapter.cancelRemoval());
+
+                mItemDeletedSnackbar.addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        // only delete from db if the snackbar timed out or was actively dismissed by the user
+                        if ((event & (DISMISS_EVENT_TIMEOUT | DISMISS_EVENT_SWIPE | DISMISS_EVENT_CONSECUTIVE)) != 0) {
+                            mDataSetViewModel.delete(position);
+                        }
+                    }
+                });
+
+                mDataSetListAdapter.pendingRemoval(position);
+                mItemDeletedSnackbar.show();
             }
 
             @Override
-            public boolean isItemViewSwipeEnabled() {
-                return true;
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                // not sure why, but this method get's called for viewholder that are already swiped away
+                if (viewHolder.getAdapterPosition() == -1) {
+                    // not interested in those
+                    return;
+                }
+
+                int itemHeight = itemView.getBottom() - itemView.getTop();
+                int trashWidth = trash.getIntrinsicWidth();
+                int trashHeight = trash.getIntrinsicWidth();
+
+                int trashTop = itemView.getTop() + (itemHeight - trashHeight)/2;
+                int trashBottom = trashTop + trashHeight;
+
+                int trashLeft;
+                int trashRight;
+                if (dX > 0) {
+                    // swipe to the right
+                    background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + (int) dX, itemView.getBottom());
+
+                    trashLeft = itemView.getLeft() + margin;
+                    trashRight = itemView.getLeft() + margin + trashWidth;
+                } else {
+                    // swipe to the left
+                    background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+
+                    trashRight = itemView.getRight() - margin;
+                    trashLeft = itemView.getRight() - margin - trashWidth;
+                }
+
+                background.draw(c);
+
+                trash.setBounds(trashLeft, trashTop, trashRight, trashBottom);
+                trash.draw(c);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
-        });
+        };
 
-        ith.attachToRecyclerView(dataSetList);
-
-        checkPermissions();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(dataSetList);
     }
 
     @Override
