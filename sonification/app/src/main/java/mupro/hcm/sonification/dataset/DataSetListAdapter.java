@@ -90,8 +90,8 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
         else return 0;
     }
 
-    public String getItemName(int position) {
-        return mDataSets.get(position).getName();
+    public DataSet getItem(int position) {
+        return mDataSets.get(position);
     }
 
     public void pendingRemoval(int position) {

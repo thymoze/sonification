@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
@@ -125,17 +126,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpItemTouchHelper() {
-        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START | ItemTouchHelper.END) {
-            Drawable background = getDrawable(R.color.error);
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
             Drawable trash = getDrawable(R.drawable.delete);
-            int margin = (int) getResources().getDimension(R.dimen.dataset_card_delete_margin);
+            int background = getResources().getColor(R.color.error, getTheme());
+            float margin = getResources().getDimension(R.dimen.dataset_card_delete_margin);
+            float radius = getResources().getDimension(R.dimen.dataset_card_radius);
+
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
+                        .getLong(CURRENT_DATASET, -1);
+
+                if (mDataSetListAdapter.getItem(viewHolder.getAdapterPosition()).getId() == currDataSetId) {
+                    return 0;
+                } else {
+                    return makeMovementFlags(0, ItemTouchHelper.START | ItemTouchHelper.END);
+                }
+            }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
 
                 mItemDeletedSnackbar = Snackbar.make(dataSetList, String.format(getResources().getString(R.string.dataset_removed_message),
-                            mDataSetListAdapter.getItemName(viewHolder.getAdapterPosition())), Snackbar.LENGTH_LONG)
+                            mDataSetListAdapter.getItem(viewHolder.getAdapterPosition()).getName()), Snackbar.LENGTH_LONG)
                         .setAction(R.string.undo, v -> mDataSetListAdapter.cancelRemoval());
 
                 mItemDeletedSnackbar.addCallback(new Snackbar.Callback() {
@@ -169,25 +183,27 @@ public class MainActivity extends AppCompatActivity {
                 int trashTop = itemView.getTop() + (itemHeight - trashHeight)/2;
                 int trashBottom = trashTop + trashHeight;
 
-                int trashLeft;
-                int trashRight;
+                float trashLeft = 0;
+                float trashRight = 0;
+
+                Paint p = new Paint();
+                p.setColor(background);
                 if (dX > 0) {
                     // swipe to the right
-                    background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + (int) dX, itemView.getBottom());
+                    c.drawRoundRect(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + dX + margin, itemView.getBottom(),  radius, radius, p);
 
                     trashLeft = itemView.getLeft() + margin;
                     trashRight = itemView.getLeft() + margin + trashWidth;
-                } else {
+                } else if (dX < 0) {
                     // swipe to the left
-                    background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    c.drawRoundRect(itemView.getRight() + dX - margin, itemView.getTop(), itemView.getRight(), itemView.getBottom(), radius, radius, p);
 
                     trashRight = itemView.getRight() - margin;
                     trashLeft = itemView.getRight() - margin - trashWidth;
                 }
 
-                background.draw(c);
-
-                trash.setBounds(trashLeft, trashTop, trashRight, trashBottom);
+                //background.draw(c);
+                trash.setBounds((int) trashLeft, trashTop, (int) trashRight, trashBottom);
                 trash.draw(c);
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
