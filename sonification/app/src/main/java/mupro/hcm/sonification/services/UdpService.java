@@ -53,7 +53,9 @@ public class UdpService extends IntentService {
         byte[] msg = new byte[4096];
         DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
-        try (DatagramSocket ds = new DatagramSocket(PORT)) {
+        DatagramSocket ds = null;
+        try {
+            ds = new DatagramSocket(PORT);
             Log.i(TAG, "Listening on port " + PORT);
             while (running) {
                 //TODO: handle the "port already in use" error (maybe intent service to disable button on HomeFragment?)
@@ -73,6 +75,9 @@ public class UdpService extends IntentService {
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+        } finally {
+            if (ds != null)
+                ds.close();
         }
     }
 
