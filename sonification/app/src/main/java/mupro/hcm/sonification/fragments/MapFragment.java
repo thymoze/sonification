@@ -8,9 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,9 +23,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.lang.ref.WeakReference;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,15 +132,14 @@ public class MapFragment extends Fragment implements
         SensorData data2 = new SensorData();
         data2.setC2h5oh(2);
         data2.setC3h8(5);
-        data2.setCo(3);
         data2.setC4h10(1);
-        data2.setH2(7);
+        data2.setH2(7.0);
         data2.setHumidity(0.4);
-        data2.setNh3(4);
-        data2.setCh4(3);
-        data2.setPm25(21);
-        data2.setPm10(22);
-        data2.setNo2(22);
+        data2.setNh3(4.0);
+        data2.setCh4(3.0);
+        data2.setPm25(21.0);
+        data2.setPm10(22.0);
+        data2.setNo2(22.0);
         data2.setTimestamp(Instant.now());
         data2.setLatitude(48.333);
         data2.setLongitude(10.898);
