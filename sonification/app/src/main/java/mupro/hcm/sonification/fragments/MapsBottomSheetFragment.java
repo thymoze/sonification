@@ -1,6 +1,7 @@
 package mupro.hcm.sonification.fragments;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -16,11 +18,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
+import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 
@@ -38,9 +43,10 @@ public class MapsBottomSheetFragment extends Fragment {
     LinearLayout cardPlaceholder;
 
     @BindView(R.id.delete_button)
-    ImageView deleteImage;
+    ImageView deleteButton;
 
-    public MapsBottomSheetFragment() {}
+    public MapsBottomSheetFragment() {
+    }
 
     public static MapsBottomSheetFragment newInstance(SensorData sensorData) {
         MapsBottomSheetFragment fragment = new MapsBottomSheetFragment();
@@ -76,6 +82,19 @@ public class MapsBottomSheetFragment extends Fragment {
                     transaction.add(R.id.card_placeholder, fragment, s.getId());
                     transaction.commit();
                 });
+
+        deleteButton.setOnClickListener((click) -> {
+            new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog)
+                    .setTitle(R.string.confirm_sensordata_delete_title)
+                    .setMessage(R.string.confirm_sensordata_delete_content)
+                    .setPositiveButton("Ja", (dialog, whichButton) -> {
+                        AsyncTask.execute(() -> AppDatabase.getDatabase(getContext()).sensorDataDao().delete(mSensorData));
+                        ((MapFragment) getParentFragment()).removeCurrentMarker();
+
+                        Toast.makeText(getContext(), R.string.delete_successful, Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Nein", null).show();
+        });
 
         return view;
     }

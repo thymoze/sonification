@@ -55,6 +55,7 @@ public class MapFragment extends Fragment implements
 
     private long mDataSetId;
     private BottomSheetBehavior mBottomSheetBehavior;
+    private Marker mCurrentMarker;
 
     @BindView(R.id.bottom_sheet_placeholder)
     FrameLayout bottomSheet;
@@ -181,6 +182,8 @@ public class MapFragment extends Fragment implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        mCurrentMarker = marker;
+
         // add a new bottom sheet with the marker information (replacing the previous one)
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         MapsBottomSheetFragment fragment = MapsBottomSheetFragment.newInstance(((SensorData) marker.getTag()));
@@ -229,5 +232,13 @@ public class MapFragment extends Fragment implements
             if (fragment != null)
                 fragment.addMarker(values[0]);
         }
+    }
+
+    public void removeCurrentMarker() {
+        mCurrentMarker.remove();
+
+        // bottom sheet should be hidden if the map is clicked
+        if (mBottomSheetBehavior != null)
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 }
