@@ -116,64 +116,6 @@ public class MapFragment extends Fragment implements
 
         this.mGoogleMap = googleMap;
         initializeMarkers();
-
-        SensorData data = new SensorData();
-        data.setC2h5oh(2);
-        data.setC3h8(5);
-        data.setCo(3);
-        data.setC4h10(1);
-        data.setH2(7);
-        data.setHumidity(0.4);
-        data.setNh3(4);
-        data.setCh4(3);
-        data.setPm25(21);
-        data.setPm10(22);
-        data.setNo2(22);
-        data.setTimestamp(Instant.now());
-        data.setLatitude(48.3);
-        data.setLongitude(10.898);
-        data.setTemperatureBMP(23);
-        data.setTemperatureSHT(22);
-        addMarker(data);
-
-        SensorData data2 = new SensorData();
-        data2.setC2h5oh(2);
-        data2.setC3h8(5);
-        data2.setC4h10(1);
-        data2.setH2(7.0);
-        data2.setHumidity(0.4);
-        data2.setNh3(4.0);
-        data2.setCh4(3.0);
-        data2.setPm25(21.0);
-        data2.setPm10(22.0);
-        data2.setNo2(22.0);
-        data2.setTimestamp(Instant.now());
-        data2.setLatitude(48.4);
-        data2.setLongitude(10.85);
-        data2.setTemperatureBMP(23);
-        data2.setTemperatureSHT(22);
-        data2.setCo(200000);
-        addMarker(data2);
-
-        SensorData data3 = new SensorData();
-        data3.setC2h5oh(2);
-        data3.setC3h8(5);
-        data3.setC4h10(1);
-        data3.setH2(7.0);
-        data3.setHumidity(0.4);
-        data3.setNh3(4.0);
-        data3.setCh4(3.0);
-        data3.setPm25(21.0);
-        data3.setPm10(22.0);
-        data3.setNo2(22.0);
-        data3.setTimestamp(Instant.now());
-        data3.setLatitude(48.5);
-        data3.setLongitude(10.898);
-        data3.setTemperatureBMP(23);
-        data3.setTemperatureSHT(22);
-        data3.setCo(200000);
-        addMarker(data3);
-
     }
 
     private void initializeMarkers() {

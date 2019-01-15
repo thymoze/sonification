@@ -28,6 +28,9 @@ import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 
+import static android.content.Context.MODE_PRIVATE;
+import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
+
 public class MapsBottomSheetFragment extends Fragment {
 
     private static final String TAG = MapsBottomSheetFragment.class.getName();
@@ -72,16 +75,20 @@ public class MapsBottomSheetFragment extends Fragment {
 
         bottomSheetTitle.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy - hh:mm").format(LocalDateTime.ofInstant(mSensorData.getTimestamp(), ZoneOffset.UTC)));
 
-        Arrays.stream(Sensor.values())
-                .sorted(Comparator.comparing(s -> s.getLocalizedName(getContext())))
-                .forEachOrdered(s -> {
-                    Log.i(TAG, "Added " + s.getId() + ": " + mSensorData.get(s));
-                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                    GasValueFragment fragment = GasValueFragment.newInstance(s.getId(), mSensorData.get(s));
-                    transaction.add(R.id.card_placeholder, fragment, s.getId());
-                    transaction.commit();
-                });
+        // disable delete button if service is running
+        if (getContext().getSharedPreferences("DATA", MODE_PRIVATE)
+                .getLong(CURRENT_DATASET, -1) != -1) {
+            deleteButton.setClickable(false);
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
 
+        setupDataPresentation();
+        setupDeleteHandler();
+
+        return view;
+    }
+
+    private void setupDeleteHandler() {
         deleteButton.setOnClickListener((click) -> {
             new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog)
                     .setTitle(R.string.confirm_sensordata_delete_title)
@@ -94,8 +101,19 @@ public class MapsBottomSheetFragment extends Fragment {
                     })
                     .setNegativeButton("Nein", null).show();
         });
+    }
 
-        return view;
+    private void setupDataPresentation() {
+        Arrays.stream(Sensor.values())
+                .sorted(Comparator.comparing(s -> s.getLocalizedName(getContext())))
+                .forEachOrdered(s -> {
+                    Log.i(TAG, "Added " + s.getId() + ": " + mSensorData.get(s));
+                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                    GasValueFragment fragment = GasValueFragment.newInstance(s.getId(), mSensorData.get(s));
+                    transaction.add(R.id.card_placeholder, fragment, s.getId());
+                    transaction.commit();
+                });
+
     }
 
     @Override
