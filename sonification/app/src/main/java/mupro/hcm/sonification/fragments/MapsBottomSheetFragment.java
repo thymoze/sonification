@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
@@ -89,7 +88,7 @@ public class MapsBottomSheetFragment extends Fragment {
                     .setMessage(R.string.confirm_sensordata_delete_content)
                     .setPositiveButton("Ja", (dialog, whichButton) -> {
                         AsyncTask.execute(() -> AppDatabase.getDatabase(getContext()).sensorDataDao().delete(mSensorData));
-                        ((MapFragment) getParentFragment()).removeCurrentMarker();
+                        ((MapFragment) getParentFragment()).updateMap();
 
                         Toast.makeText(getContext(), R.string.delete_successful, Toast.LENGTH_SHORT).show();
                     })

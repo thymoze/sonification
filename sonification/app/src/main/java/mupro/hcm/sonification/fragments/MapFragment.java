@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,7 +25,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import java.lang.ref.WeakReference;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -51,11 +55,11 @@ public class MapFragment extends Fragment implements
     private SupportMapFragment mSupportMapFragment;
     private GoogleMap mGoogleMap;
     private List<Polyline> polylines;
-    private SensorData previousData;
 
     private long mDataSetId;
     private BottomSheetBehavior mBottomSheetBehavior;
     private Marker mCurrentMarker;
+    private LinkedList<Marker> markers;
 
     @BindView(R.id.bottom_sheet_placeholder)
     FrameLayout bottomSheet;
@@ -75,6 +79,7 @@ public class MapFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         polylines = new ArrayList<>();
+        markers = new LinkedList<>();
         if (getArguments() != null) {
             mDataSetId = getArguments().getLong(ARG_DATASET_ID);
         }
@@ -125,11 +130,12 @@ public class MapFragment extends Fragment implements
         data.setPm10(22);
         data.setNo2(22);
         data.setTimestamp(Instant.now());
-        data.setLatitude(48.333);
+        data.setLatitude(48.3);
         data.setLongitude(10.898);
         data.setTemperatureBMP(23);
         data.setTemperatureSHT(22);
         addMarker(data);
+
         SensorData data2 = new SensorData();
         data2.setC2h5oh(2);
         data2.setC3h8(5);
@@ -142,20 +148,39 @@ public class MapFragment extends Fragment implements
         data2.setPm10(22.0);
         data2.setNo2(22.0);
         data2.setTimestamp(Instant.now());
-        data2.setLatitude(48.333);
-        data2.setLongitude(10.898);
+        data2.setLatitude(48.4);
+        data2.setLongitude(10.85);
         data2.setTemperatureBMP(23);
         data2.setTemperatureSHT(22);
         data2.setCo(200000);
-        data2.setLatitude(48.5);
         addMarker(data2);
+
+        SensorData data3 = new SensorData();
+        data3.setC2h5oh(2);
+        data3.setC3h8(5);
+        data3.setC4h10(1);
+        data3.setH2(7.0);
+        data3.setHumidity(0.4);
+        data3.setNh3(4.0);
+        data3.setCh4(3.0);
+        data3.setPm25(21.0);
+        data3.setPm10(22.0);
+        data3.setNo2(22.0);
+        data3.setTimestamp(Instant.now());
+        data3.setLatitude(48.5);
+        data3.setLongitude(10.898);
+        data3.setTemperatureBMP(23);
+        data3.setTemperatureSHT(22);
+        data3.setCo(200000);
+        addMarker(data3);
+
     }
 
     private void initializeMarkers() {
         new loadFromDbTask(this).execute(mDataSetId);
     }
 
-    public Void addMarker(SensorData data) {
+    public Marker addMarker(SensorData data) {
         Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(data.getLatitude(), data.getLongitude())));
         marker.setTag(data);
@@ -166,18 +191,22 @@ public class MapFragment extends Fragment implements
                 .build();
         mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
 
+        addPolyline(markers.peekLast(), marker);
+        markers.add(marker);
+
+        Log.i(TAG, "Marker added for " + data.getTimestamp());
+        return marker;
+    }
+
+    private void addPolyline(Marker start, Marker end) {
         // add a polyline if there was previous data
-        if (previousData != null) {
-            PolylineOptions options = new PolylineOptions().add(new LatLng(previousData.getLatitude(), previousData.getLongitude()))
-                    .add(new LatLng(data.getLatitude(), data.getLongitude()));
+        if (start != null && end != null) {
+            PolylineOptions options = new PolylineOptions().add(start.getPosition())
+                    .add(end.getPosition());
             Polyline line = mGoogleMap.addPolyline(options);
             line.setZIndex(1000);
             polylines.add(line);
         }
-        previousData = data;
-
-        Log.i(TAG, "Marker added for " + data.getTimestamp());
-        return null;
     }
 
     @Override
@@ -234,8 +263,34 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    public void removeCurrentMarker() {
+    public void updateMap() {
+        // remove old polylines from that point
+        List<Polyline> adjLines = polylines.stream()
+                .flatMap(lines -> Stream.of(lines.getPoints())
+                        .filter(latLng -> latLng.get(0).equals(mCurrentMarker.getPosition()) || latLng.get(1).equals(mCurrentMarker.getPosition()))
+                        .limit(2)
+                        .map(marker -> lines)).collect(Collectors.toList());
+
+        Log.i(TAG, "Adj: " + adjLines.size());
+        Log.i(TAG, "All: " + polylines.size());
+        polylines.removeAll(adjLines);
+        adjLines.forEach(Polyline::remove);
+
+        int index = markers.indexOf(mCurrentMarker);
+
+        // add new polyline only if marker is not start or end
+        if (index > 0 && index < markers.size() - 1) {
+            Marker prev = markers.get(index - 1);
+            Marker next = markers.get(index + 1);
+
+            addPolyline(prev, next);
+        }
+
+        // remove marker
+        markers.remove(index);
         mCurrentMarker.remove();
+
+        // TODO: recalculate distance
 
         // bottom sheet should be hidden if the map is clicked
         if (mBottomSheetBehavior != null)
