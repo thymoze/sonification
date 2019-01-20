@@ -115,21 +115,19 @@ public class ChartsFragment extends Fragment {
     }
 
     public Void updateCharts(SensorData data) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getChildFragmentManager();
         for (String s : mSensors) {
-            if (fragmentManager != null) {
-                ChartCardFragment fragment = (ChartCardFragment) fragmentManager.findFragmentByTag(s);
+            ChartCardFragment fragment = (ChartCardFragment) fragmentManager.findFragmentByTag(s);
 
-                if (fragment != null) {
-                    Double val = data.get(Sensor.fromId(s));
-                    if (val != null) {
-                        fragment.addEntryToChart(data.getTimestamp(), val.floatValue());
-                    } else {
-                        Log.e(TAG, "val is null: " + s);
-                    }
+            if (fragment != null) {
+                Double val = data.get(Sensor.fromId(s));
+                if (val != null) {
+                    fragment.addEntryToChart(data.getTimestamp(), val.floatValue());
                 } else {
-                    Log.i(TAG, "ChartsCardFragment " + s + " is null");
+                    Log.e(TAG, "val is null: " + s);
                 }
+            } else {
+                Log.i(TAG, "ChartsCardFragment " + s + " is null");
             }
         }
 
