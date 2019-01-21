@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="services">
+        <item>MQTT</item>
+        <item>UDP</item>
+    </string-array>
+
+    <string-array name="sounds">
+        <item>Bass</item>
+        <item>Bell</item>
+        <item>Bow</item>
+        <item>Harp</item>
+        <item>Piano</item>
+        <item>Sakura</item>
+        <item>Sax</item>
+        <item>Violin</item>
+    </string-array>
+</resources>

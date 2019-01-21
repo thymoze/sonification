@@ -33,6 +33,8 @@
                 android:value="mupro.hcm.sonification.MainActivity" />
         </activity>
 
+        <activity android:name=".preferences.PreferencesActivity" />
+
         <service
             android:name=".services.DataService"
             android:enabled="true" />

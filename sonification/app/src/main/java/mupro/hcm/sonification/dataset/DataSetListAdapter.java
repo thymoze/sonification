@@ -1,8 +1,8 @@
 package mupro.hcm.sonification.dataset;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -28,9 +29,12 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     private MainActivity mContext;
     // Cached copy of DataSets
     private List<DataSet> mDataSets;
+    private int mPendingIndex;
+    private DataSet mPendingDataset;
 
     public DataSetListAdapter(MainActivity context) {
         mContext = context;
+        mDataSets = new ArrayList<>();
     }
 
     @NonNull
@@ -63,7 +67,19 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     }
 
     public void setDataSets(List<DataSet> dataSets) {
-        mDataSets = dataSets;
+        mDataSets.clear();
+        mDataSets.addAll(dataSets);
+
+        // if a dataset pending removal exist in the new dataset
+        // we save the index in the new dataset and a reference to the newer object
+        // otherwise we discard the pending values
+        int index = mDataSets.indexOf(mPendingDataset);
+        if (index != -1) {
+            mPendingDataset = mDataSets.remove(index);
+        } else {
+            mPendingDataset = null;
+        }
+        mPendingIndex = index;
         notifyDataSetChanged();
     }
 
@@ -74,8 +90,22 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
         else return 0;
     }
 
-    public void onItemDismiss(int position) {
+    public DataSet getItem(int position) {
+        return mDataSets.get(position);
+    }
+
+    public void pendingRemoval(int position) {
+        Log.e(TAG, "pendingRemoval: " + position);
+        mPendingIndex = position;
+        mPendingDataset = mDataSets.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void cancelRemoval() {
+        mDataSets.add(mPendingIndex, mPendingDataset);
+        notifyItemInserted(mPendingIndex);
+        mPendingDataset = null;
+        mPendingIndex = -1;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

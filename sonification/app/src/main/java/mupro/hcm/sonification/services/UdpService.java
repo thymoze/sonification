@@ -26,6 +26,7 @@ public class UdpService extends IntentService {
     private static final String TAG = UdpService.class.getName();
     private static final int PORT = 7777;
     private ResultReceiver receiver;
+    private DatagramSocket mSocket;
 
     private final int LOCATION_SUCCESS = 1;
     private final int LOCATION_ERROR = 2;
@@ -53,11 +54,11 @@ public class UdpService extends IntentService {
         byte[] msg = new byte[4096];
         DatagramPacket dp = new DatagramPacket(msg, msg.length);
 
-        try (DatagramSocket ds = new DatagramSocket(PORT)) {
+        try {
+            mSocket = new DatagramSocket(PORT);
             Log.i(TAG, "Listening on port " + PORT);
             while (running) {
-                //TODO: handle the "port already in use" error (maybe intent service to disable button on HomeFragment?)
-                ds.receive(dp);
+                mSocket.receive(dp);
                 if (!running)
                     break;
 
@@ -73,6 +74,9 @@ public class UdpService extends IntentService {
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+        } finally {
+            if (mSocket != null)
+                mSocket.close();
         }
     }
 
@@ -93,5 +97,7 @@ public class UdpService extends IntentService {
         super.onDestroy();
         this.running = false;
         this.receiver = null;
+        if (mSocket != null)
+            mSocket.close();
     }
 }

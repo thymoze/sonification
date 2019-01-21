@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/title_sounds">
+
+    <ListPreference
+        android:defaultValue="@string/bass"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="pm_preference"
+        app:title="@string/pm"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/bell"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="co_preference"
+        app:title="@string/co"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/bow"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="nh3_preference"
+        app:title="@string/nh3"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/harp"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="no2_preference"
+        app:title="@string/no2"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/piano"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="c2h5oh_preference"
+        app:title="@string/c2h5oh"
+        app:iconSpaceReserved="false"/>
+
+    <!--<ListPreference
+        app:key="h2_preference"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        app:title="@string/h2"
+android:summary="%s"/>-->
+
+    <ListPreference
+        android:defaultValue="@string/sakura"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="c4h10_preference"
+        app:title="@string/c4h10"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/sax"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="ch4_preference"
+        app:title="@string/ch4"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="@string/violin"
+        android:entries="@array/sounds"
+        android:entryValues="@array/sounds"
+        android:summary="%s"
+        app:key="c3h8_preference"
+        app:title="@string/c3h8"
+        app:iconSpaceReserved="false"/>
+
+</PreferenceScreen>

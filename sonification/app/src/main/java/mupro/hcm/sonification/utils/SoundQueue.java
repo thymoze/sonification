@@ -12,7 +12,7 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
 
     private final String TAG = "SoundQueue";
     private Context context;
-    private LinkedList<String> playlist;
+    private LinkedList<Sound> playlist;
     private boolean playing = false;
 
     public SoundQueue(Context context) {
@@ -23,9 +23,11 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
 
     /**
      * Plays a single sound file given the fileName.
-     * @param fileName the sound file name
+     *
+     * @param sound the sound file name
      */
-    public void playSound(final String fileName) {
+    public void playSound(final Sound sound) {
+        String fileName = "sounds/" + sound.getInstrument().toLowerCase() + "-" + sound.getDirection().getId() + ".mp3";
         if (!playing) {
             playing = true;
             new Thread(() -> {
@@ -43,7 +45,7 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
             }).start();
         } else {
             Log.i(TAG, "Queued: " + fileName);
-            playlist.add(fileName);
+            playlist.add(sound);
         }
     }
 

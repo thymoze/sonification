@@ -22,7 +22,6 @@ import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.location.FusedLocationProvider;
-import mupro.hcm.sonification.utils.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
@@ -35,7 +34,7 @@ public class DataService extends Service {
     private NotificationManager notificationManager;
     private static String CHANNEL_ID = "1338";
     private static int FOREGROUND_ID = 1337;
-    private String notificationTitle = "Sonification";
+
     private UdpDataReceiver udpDataReceiver;
     private boolean receiving = false;
 
@@ -44,13 +43,6 @@ public class DataService extends Service {
         super.onCreate();
         startForeground(FOREGROUND_ID, buildForegroundNotification());
         Log.i(TAG, "onCreate");
-
-        // TODO: remove this test
-        SoundQueue queue = new SoundQueue(this);
-        queue.playSound("sounds/sax-up.mp3");
-        queue.playSound("sounds/ball-up.mp3");
-        queue.playSound("sounds/bass-down.mp3");
-        queue.playSound("sounds/sakura-down.mp3");
 
         startReceivingData();
     }
@@ -89,7 +81,7 @@ public class DataService extends Service {
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .setSmallIcon(R.drawable.common_full_open_on_phone)
-                .setContentTitle(notificationTitle)
+                .setContentTitle(getResources().getString(R.string.app_name))
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("The Sonification App is currently receiving in the background and tracking your position."))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

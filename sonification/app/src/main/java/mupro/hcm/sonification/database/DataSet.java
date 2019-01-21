@@ -3,6 +3,8 @@ package mupro.hcm.sonification.database;
 
 import java.time.Instant;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -45,5 +47,27 @@ public class DataSet {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return getId() + ": " + getName();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof DataSet)) {
+            return false;
+        }
+        DataSet other = (DataSet) obj;
+        return this.getId() == other.getId() && this.getName().equals(other.getName())
+                && this.getTimestamp().equals(other.getTimestamp());
     }
 }

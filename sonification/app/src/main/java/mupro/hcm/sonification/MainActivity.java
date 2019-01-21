@@ -1,19 +1,21 @@
 package mupro.hcm.sonification;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +33,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -60,6 +63,7 @@ import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.DataSetDao;
 import mupro.hcm.sonification.dataset.DataSetListAdapter;
 import mupro.hcm.sonification.dataset.DataSetViewModel;
+import mupro.hcm.sonification.preferences.PreferencesActivity;
 import mupro.hcm.sonification.services.DataService;
 
 public class MainActivity extends AppCompatActivity {
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private DataSetListAdapter mDataSetListAdapter;
     private RecyclerView.LayoutManager mDataSetListLayoutManager;
     private DataSetViewModel mDataSetViewModel;
+    private Snackbar mItemDeletedSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,19 +96,18 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        setUpRecyclerView();
+
+        checkPermissions();
+    }
+
+    private void setUpRecyclerView() {
         dataSetList.setHasFixedSize(true);
 
         mDataSetListLayoutManager = new LinearLayoutManager(this);
         dataSetList.setLayoutManager(mDataSetListLayoutManager);
 
         mDataSetListAdapter = new DataSetListAdapter(this);
-        mDataSetListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                for (int i = positionStart; i < positionStart + itemCount; i++)
-                    mDataSetViewModel.delete(i);
-            }
-        });
         dataSetList.setAdapter(mDataSetListAdapter);
 
         mDataSetViewModel = ViewModelProviders.of(this).get(DataSetViewModel.class);
@@ -112,52 +116,119 @@ public class MainActivity extends AppCompatActivity {
         dataSetList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                int px = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12,
-                                getResources().getDisplayMetrics()));
+                int px = (int) getResources().getDimension(R.dimen.dataset_card_margin);
                 outRect.top = parent.getChildAdapterPosition(view) == 0 ? px : 0;
                 outRect.bottom = px;
             }
         });
 
-        ItemTouchHelper ith = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        setUpItemTouchHelper();
+    }
+
+    private void setUpItemTouchHelper() {
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+            Drawable trash = getDrawable(R.drawable.delete);
+            int background = getResources().getColor(R.color.error, getTheme());
+            float margin = getResources().getDimension(R.dimen.dataset_card_delete_margin);
+            float radius = getResources().getDimension(R.dimen.dataset_card_radius);
+
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(0, ItemTouchHelper.START | ItemTouchHelper.END);
+                long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
+                        .getLong(CURRENT_DATASET, -1);
+
+                if (mDataSetListAdapter.getItem(viewHolder.getAdapterPosition()).getId() == currDataSetId) {
+                    return 0;
+                } else {
+                    return makeMovementFlags(0, ItemTouchHelper.START | ItemTouchHelper.END);
+                }
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                mDataSetListAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+                int position = viewHolder.getAdapterPosition();
+
+                mItemDeletedSnackbar = Snackbar.make(dataSetList, String.format(getResources().getString(R.string.dataset_removed_message),
+                            mDataSetListAdapter.getItem(viewHolder.getAdapterPosition()).getName()), Snackbar.LENGTH_LONG)
+                        .setAction(R.string.undo, v -> mDataSetListAdapter.cancelRemoval());
+
+                mItemDeletedSnackbar.addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        // only delete from db if the snackbar timed out or was actively dismissed by the user
+                        if ((event & (DISMISS_EVENT_TIMEOUT | DISMISS_EVENT_SWIPE | DISMISS_EVENT_CONSECUTIVE)) != 0) {
+                            mDataSetViewModel.delete(position);
+                        }
+                    }
+                });
+
+                mDataSetListAdapter.pendingRemoval(position);
+                mItemDeletedSnackbar.show();
             }
 
             @Override
-            public boolean isItemViewSwipeEnabled() {
-                return true;
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                // not sure why, but this method get's called for viewholder that are already swiped away
+                if (viewHolder.getAdapterPosition() == -1) {
+                    // not interested in those
+                    return;
+                }
+
+                int itemHeight = itemView.getBottom() - itemView.getTop();
+                int trashWidth = trash.getIntrinsicWidth();
+                int trashHeight = trash.getIntrinsicWidth();
+
+                int trashTop = itemView.getTop() + (itemHeight - trashHeight)/2;
+                int trashBottom = trashTop + trashHeight;
+
+                float trashLeft = 0;
+                float trashRight = 0;
+
+                Paint p = new Paint();
+                p.setColor(background);
+                if (dX > 0) {
+                    // swipe to the right
+                    c.drawRoundRect(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + dX + margin, itemView.getBottom(),  radius, radius, p);
+
+                    trashLeft = itemView.getLeft() + margin;
+                    trashRight = itemView.getLeft() + margin + trashWidth;
+                } else if (dX < 0) {
+                    // swipe to the left
+                    c.drawRoundRect(itemView.getRight() + dX - margin, itemView.getTop(), itemView.getRight(), itemView.getBottom(), radius, radius, p);
+
+                    trashRight = itemView.getRight() - margin;
+                    trashLeft = itemView.getRight() - margin - trashWidth;
+                }
+
+                //background.draw(c);
+                trash.setBounds((int) trashLeft, trashTop, (int) trashRight, trashBottom);
+                trash.draw(c);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
-        });
+        };
 
-        ith.attachToRecyclerView(dataSetList);
-
-        checkPermissions();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        return super.onPrepareOptionsMenu(menu);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(dataSetList);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getSharedPreferences("DATA", MODE_PRIVATE)
                 .getLong(CURRENT_DATASET, -1) != -1) {
-            getMenuInflater().inflate(R.menu.stop_menu, menu);
+            menu.add(Menu.NONE, R.id.stop, Menu.NONE, R.string.stop)
+                    .setIcon(R.drawable.ic_stop_black_24dp)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
+
+        menu.add(Menu.NONE, R.id.settings, Menu.NONE, R.string.settings);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -168,6 +239,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.stop:
                 stopDataService();
                 return true;
+            case R.id.settings:
+                Intent intent = new Intent(this, PreferencesActivity.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -188,9 +262,6 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.setOnShowListener(dia -> {
             Button button_pos = ((AlertDialog) dia).getButton(AlertDialog.BUTTON_POSITIVE);
-            Button button_neg = ((AlertDialog) dia).getButton(AlertDialog.BUTTON_NEGATIVE);
-            button_pos.setTextColor(Color.parseColor("#3B3B3B"));
-            button_neg.setTextColor(Color.parseColor("#3B3B3B"));
             button_pos.setOnClickListener(v -> {
                 String name = input.getText().toString();
                 if (!name.isEmpty()) {

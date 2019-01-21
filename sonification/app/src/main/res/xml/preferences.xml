@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:key="service_preference"
+        android:entries="@array/services"
+        android:entryValues="@array/services"
+        android:defaultValue="UDP"
+        android:summary="%s"
+        app:title="@string/background_service"
+        android:icon="@drawable/access_point"/>
+
+    <MultiSelectListPreference
+        android:key="sensors_preference"
+        app:title="@string/title_charts"
+        android:summary="@string/display_charts"
+        android:icon="@drawable/ic_charts_black_24dp" />
+
+    <Preference
+        app:title="@string/title_sounds"
+        android:icon="@drawable/music_note"
+        app:summary="@string/map_sensor_sound"
+        app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
+</PreferenceScreen>
