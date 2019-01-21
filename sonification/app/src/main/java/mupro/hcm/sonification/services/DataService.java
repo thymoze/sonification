@@ -26,7 +26,6 @@ import com.google.android.gms.location.LocationServices;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
-import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
@@ -34,7 +33,6 @@ import mupro.hcm.sonification.database.SensorData;
 
 import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
-import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
 import static mupro.hcm.sonification.MainActivity.EXTRA_SENSORDATA;
 import static mupro.hcm.sonification.MainActivity.EXTRA_UDPRECEIVER;
 
@@ -98,9 +96,8 @@ public class DataService extends Service {
             Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
         }
 
-        Intent udpIntent = new Intent(DataService.this, UdpService.class);
-        udpIntent.putExtra(EXTRA_UDPRECEIVER, mUdpDataReceiver);
-        startService(udpIntent);
+        startSonification();
+        startUdpReceiver();
 
         return START_NOT_STICKY;
     }
@@ -120,10 +117,35 @@ public class DataService extends Service {
             Log.e(TAG, "Lost location permission. Could not remove updates. " + unlikely);
         }
 
-        Intent udpIntent = new Intent(DataService.this, UdpService.class);
-        stopService(udpIntent);
+        stopUdpReceiver();
+        stopSonification();
 
         mNotificationManager.deleteNotificationChannel(CHANNEL_ID);
+    }
+
+    private void startSonification() {
+        Log.i(TAG, "Starting Sonification Service");
+        final Intent intent = new Intent(DataService.this, SonificationService.class);
+        startService(intent);
+    }
+
+    private void stopSonification() {
+        Log.i(TAG, "Stopping Sonification Service");
+        final Intent intent = new Intent(DataService.this, SonificationService.class);
+        stopService(intent);
+    }
+
+    private void startUdpReceiver() {
+        Log.i(TAG, "Starting Udp Service");
+        Intent udpIntent = new Intent(DataService.this, UdpService.class);
+        udpIntent.putExtra(EXTRA_UDPRECEIVER, mUdpDataReceiver);
+        startService(udpIntent);
+    }
+
+    private void stopUdpReceiver() {
+        Log.i(TAG, "Stopping Udp Service");
+        Intent udpIntent = new Intent(DataService.this, UdpService.class);
+        stopService(udpIntent);
     }
 
     private long saveDataToDatabase(SensorData sensorData) {

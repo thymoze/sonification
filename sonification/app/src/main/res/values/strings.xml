@@ -40,6 +40,11 @@
     <string name="temperatureSHT">Temperatur (SHT)</string>
     <string name="temperatureBMP">Temperatur (BMP)</string>
 
+
+    <string name="confirm_sensordata_delete_title">Messdaten löschen</string>
+    <string name="confirm_sensordata_delete_content">Wollen Sie diese Messdaten wirklich löschen?</string>
+    <string name="delete_successful">Messdaten erfolgreich gelöscht!</string>
+
     <string name="bass">Bass</string>
     <string name="bell"> Bell</string>
     <string name="bow">Bow</string>

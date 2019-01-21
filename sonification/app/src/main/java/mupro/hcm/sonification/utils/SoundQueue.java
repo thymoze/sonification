@@ -3,10 +3,15 @@ package mupro.hcm.sonification.utils;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
+
+import mupro.hcm.sonification.sensors.Sensor;
 
 public class SoundQueue implements MediaPlayer.OnCompletionListener {
 
@@ -46,6 +51,14 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
         } else {
             Log.i(TAG, "Queued: " + fileName);
             playlist.add(sound);
+        }
+    }
+
+    public void playSoundForSensorWithDirection(Sensor sensor, Direction direction) {
+        String instrument = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(sensor.getId().toLowerCase() + "_preference", null);
+        if (instrument != null) {
+            playSound(new Sound(instrument, direction));
         }
     }
 
