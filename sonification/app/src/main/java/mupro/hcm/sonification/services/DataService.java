@@ -45,6 +45,17 @@ public class DataService extends Service {
         Log.i(TAG, "onCreate");
 
         startReceivingData();
+        startSonification();
+    }
+
+    private void startSonification() {
+        final Intent intent = new Intent(DataService.this, SonificationService.class);
+        startService(intent);
+    }
+
+    private void stopSonification() {
+        final Intent intent = new Intent(DataService.this, SonificationService.class);
+        stopService(intent);
     }
 
     public void startReceivingData() {
@@ -144,6 +155,7 @@ public class DataService extends Service {
         super.onDestroy();
         stopForeground(true);
         stopReceivingData();
+        stopSonification();
         Log.i(TAG, "onDestroy");
     }
 
