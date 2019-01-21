@@ -16,7 +16,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
         MultiSelectListPreference chartsPreference = findPreference("sensors_preference");
         chartsPreference.setEntries(Arrays.stream(Sensor.values()).map(s -> s.getLocalizedName(getContext())).toArray(CharSequence[]::new));
-        chartsPreference.setEntryValues(Arrays.stream(Sensor.values()).map(Sensor::getId).toArray(CharSequence[]::new));
+        CharSequence[] entryValues = Arrays.stream(Sensor.values()).map(Sensor::getId).toArray(CharSequence[]::new);
+        chartsPreference.setEntryValues(entryValues);
+        chartsPreference.setDefaultValue(entryValues);
     }
 
     @Override
