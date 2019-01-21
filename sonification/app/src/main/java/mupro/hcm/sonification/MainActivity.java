@@ -1,7 +1,6 @@
 package mupro.hcm.sonification;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -14,6 +13,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,11 +68,17 @@ import mupro.hcm.sonification.services.DataService;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
+    private static final String PACKAGE = MainActivity.class.getPackage().getName();
+
+    public static final String ACTION_BROADCAST = PACKAGE.concat(".broadcast");
+
+    public static final String EXTRA_SENSORDATA = PACKAGE.concat(".sensor_data");
+    public static final String EXTRA_UDPRECEIVER = PACKAGE.concat(".receiver");
+    public static final String EXTRA_DATASETID = PACKAGE.concat(".dataset_id");
+
+    public static final String CURRENT_DATASET = "CURRENT_DATASET";
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
-
-    public static final String BROADCAST_ACTION = TAG.concat("broadcast_action");
-    public static final String CURRENT_DATASET = "CURRENT_DATASET";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -134,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
+                long currDataSetId = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                         .getLong(CURRENT_DATASET, -1);
 
                 if (mDataSetListAdapter.getItem(viewHolder.getAdapterPosition()).getId() == currDataSetId) {
@@ -221,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (getSharedPreferences("DATA", MODE_PRIVATE)
+        if (PreferenceManager.getDefaultSharedPreferences(this)
                 .getLong(CURRENT_DATASET, -1) != -1) {
             menu.add(Menu.NONE, R.id.stop, Menu.NONE, R.string.stop)
                     .setIcon(R.drawable.ic_stop_black_24dp)
@@ -279,7 +285,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void startDataService() {
         final Intent intent = new Intent(this, DataService.class);
-        startService(intent);
         startForegroundService(intent);
 
         invalidateOptionsMenu();
@@ -290,10 +295,8 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, DataService.class);
         stopService(intent);
 
-        getSharedPreferences("DATA", MODE_PRIVATE)
-                .edit()
-                .remove(CURRENT_DATASET)
-                .apply();
+        PreferenceManager.getDefaultSharedPreferences(this).edit().remove(CURRENT_DATASET).apply();
+
         invalidateOptionsMenu();
         startNewButton.setVisibility(View.VISIBLE);
     }
@@ -394,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
             long id = mDataSetDao.insert(current);
             MainActivity context = mContext.get();
             if (context != null) {
-                context.getSharedPreferences("DATA", MODE_PRIVATE)
+                PreferenceManager.getDefaultSharedPreferences(context)
                         .edit()
                         .putLong(CURRENT_DATASET, id)
                         .apply();
@@ -407,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
             MainActivity context = mContext.get();
             if (context != null) {
                 Intent intent = new Intent(context, DataActivity.class);
-                intent.putExtra("DATASET_ID", id);
+                intent.putExtra(EXTRA_DATASETID, id);
                 context.startActivity(intent);
                 context.startDataService();
             }

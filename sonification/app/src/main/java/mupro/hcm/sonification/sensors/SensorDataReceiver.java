@@ -9,6 +9,8 @@ import java.util.function.Function;
 
 import mupro.hcm.sonification.database.SensorData;
 
+import static mupro.hcm.sonification.MainActivity.EXTRA_SENSORDATA;
+
 public class SensorDataReceiver extends BroadcastReceiver {
 
     private static final String TAG = SensorDataReceiver.class.getName();
@@ -21,7 +23,7 @@ public class SensorDataReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SensorData data = (SensorData) intent.getSerializableExtra("sensorData");
+        SensorData data = (SensorData) intent.getSerializableExtra(EXTRA_SENSORDATA);
         Log.i(TAG, "Received SensorData");
         callback.apply(data);
     }

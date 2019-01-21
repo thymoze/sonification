@@ -5,64 +5,134 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
+import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.location.FusedLocationProvider;
 
-import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
+import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
+import static mupro.hcm.sonification.MainActivity.EXTRA_SENSORDATA;
+import static mupro.hcm.sonification.MainActivity.EXTRA_UDPRECEIVER;
 
 public class DataService extends Service {
+    private static final String TAG = DataService.class.getName();
 
-    private final String TAG = "DataService";
+    // Update interval for location requests
+    private static final long UPDATE_INTERVAL = 3000;
+    private static final long FASTEST_UPDATE_INTERVAL = UPDATE_INTERVAL / 2;
 
-    // needed for notification
-    private NotificationManager notificationManager;
-    private static String CHANNEL_ID = "1338";
-    private static int FOREGROUND_ID = 1337;
+    // Channel name and id for the foreground service notification
+    private static final String CHANNEL_ID = "channel_01";
+    private static final int NOTIFICATION_ID = 1337;
 
-    private UdpDataReceiver udpDataReceiver;
-    private boolean receiving = false;
+
+    private NotificationManager mNotificationManager;
+    private LocationRequest mLocationRequest;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
+
+    private Location mLocation;
+
+    private UdpDataReceiver mUdpDataReceiver;
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        startForeground(FOREGROUND_ID, buildForegroundNotification());
-        Log.i(TAG, "onCreate");
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        startReceivingData();
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                Log.i(TAG, "Location updated");
+                mLocation = locationResult.getLastLocation();
+            }
+        };
+
+        createLocationRequest();
+        getLastLocation();
+
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT);
+        mNotificationManager.createNotificationChannel(mChannel);
+
+        HandlerThread handlerThread = new HandlerThread(TAG);
+        handlerThread.start();
+        mUdpDataReceiver = new UdpDataReceiver(new Handler(handlerThread.getLooper()));
     }
 
-    public void startReceivingData() {
-        udpDataReceiver = new UdpDataReceiver(new Handler());
-        Intent intent = new Intent(DataService.this, UdpService.class);
-        intent.putExtra("receiver", udpDataReceiver);
-        startService(intent);
-        receiving = true;
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "Service started.");
+        startForeground(NOTIFICATION_ID, getNotification());
+
+        try {
+            Log.i(TAG, "Requesting location updates");
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback, Looper.myLooper());
+        } catch (SecurityException unlikely) {
+            Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
+        }
+
+        Intent udpIntent = new Intent(DataService.this, UdpService.class);
+        udpIntent.putExtra(EXTRA_UDPRECEIVER, mUdpDataReceiver);
+        startService(udpIntent);
+
+        return START_NOT_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "Removing location updates");
+        try {
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        } catch (SecurityException unlikely) {
+            Log.e(TAG, "Lost location permission. Could not remove updates. " + unlikely);
+        }
+
+        Intent udpIntent = new Intent(DataService.this, UdpService.class);
+        stopService(udpIntent);
+
+        mNotificationManager.deleteNotificationChannel(CHANNEL_ID);
     }
 
     private long saveDataToDatabase(SensorData sensorData) {
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("DATA", Context.MODE_PRIVATE);
-        long id = sharedPreferences.getLong(CURRENT_DATASET, -1);
+        long dataSetId = PreferenceManager.getDefaultSharedPreferences(this).getLong(CURRENT_DATASET, -1);
 
         Log.i(TAG, "Saving to database...");
-        if (id != -1) {
+        if (dataSetId != -1) {
             if (sensorData != null) {
-                sensorData.setDataSetId(id);
+                sensorData.setDataSetId(dataSetId);
                 long sensorId = AppDatabase.getDatabase(getApplicationContext()).sensorDataDao().insert(sensorData);
                 Log.i(TAG, "Saved " + sensorId + " to database...");
                 return sensorId;
@@ -71,30 +141,40 @@ public class DataService extends Service {
         return -1;
     }
 
-    private Notification buildForegroundNotification() {
-        // Create an explicit intent for an Activity in your app
+    private Notification getNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("The Sonification App is currently receiving in the background and tracking your position.")
                 .setOngoing(true)
-                .setAutoCancel(false)
-                .setSmallIcon(R.drawable.common_full_open_on_phone)
-                .setContentTitle(getResources().getString(R.string.app_name))
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("The Sonification App is currently receiving in the background and tracking your position."))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent);
+                .setSmallIcon(R.drawable.music_note)
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
 
+        return builder.build();
+    }
 
-        notificationManager = getSystemService(NotificationManager.class);
-        NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Sonification", NotificationManager.IMPORTANCE_DEFAULT);
+    private void getLastLocation() {
+        try {
+            mFusedLocationClient.getLastLocation()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            mLocation = task.getResult();
+                        } else {
+                            Log.w(TAG, "Failed to get location.");
+                        }
+                    });
+        } catch (SecurityException unlikely) {
+            Log.e(TAG, "Lost location permission." + unlikely);
+        }
+    }
 
-        notificationManager.createNotificationChannel(notificationChannel);
-        notificationManager.notify(FOREGROUND_ID, mBuilder.build());
-
-        return (mBuilder.build());
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private class UdpDataReceiver extends ResultReceiver {
@@ -108,51 +188,22 @@ public class DataService extends Service {
             SensorData data = ((SensorData) resultData.getSerializable("sensorData"));
             Log.i(TAG, "Received: " + data.getTimestamp());
 
-
             Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
-            FusedLocationProvider.requestSingleUpdate(DataService.this, (callback -> {
-                Toast.makeText(DataService.this, "Location received!", Toast.LENGTH_SHORT).show();
 
-                if (!receiving)
-                    return;
+            data.setLatitude(mLocation.getLatitude());
+            data.setLongitude(mLocation.getLongitude());
 
-                data.setLatitude(callback.latitude);
-                data.setLongitude(callback.longitude);
+            AsyncTask.execute(() -> {
+                long id = saveDataToDatabase(data);
+                data.setId(id);
 
-                AsyncTask.execute(() -> {
-                    long id = saveDataToDatabase(data);
-                    data.setId(id);
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction(ACTION_BROADCAST);
+                broadcastIntent.putExtra(EXTRA_SENSORDATA, data);
 
-                    Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(BROADCAST_ACTION);
-                    broadcastIntent.putExtra("sensorData", data);
-
-                    Log.i(TAG, "Sending broadcast for " + id);
-                    sendBroadcast(broadcastIntent);
-                });
-
-            }));
+                Log.i(TAG, "Sending broadcast for " + id);
+                sendBroadcast(broadcastIntent);
+            });
         }
     }
-
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopForeground(true);
-        stopReceivingData();
-        Log.i(TAG, "onDestroy");
-    }
-
-    public void stopReceivingData() {
-        this.udpDataReceiver = null;
-        this.notificationManager = null;
-        Intent intent = new Intent(DataService.this, UdpService.class);
-        stopService(intent);
-        receiving = false;
-    }
 }
-

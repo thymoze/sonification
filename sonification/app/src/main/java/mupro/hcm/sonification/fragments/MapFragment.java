@@ -32,7 +32,6 @@ import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.database.SensorDataDao;
-import mupro.hcm.sonification.location.FusedLocationProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -90,13 +89,13 @@ public class MapFragment extends Fragment implements
         googleMap.setMyLocationEnabled(true);
         googleMap.setOnMarkerClickListener(this);
 
-        FusedLocationProvider.requestSingleUpdate(getContext(), (location -> {
+        /*FusedLocationProvider.requestSingleUpdate(getContext(), (location -> {
             CameraPosition position = new CameraPosition.Builder()
                     .target(new LatLng(location.latitude, location.longitude))
                     .zoom(15.0f)
                     .build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
-        }));
+        }));*/
 
         this.mGoogleMap = googleMap;
         initializeMarkers();

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,8 +33,9 @@ import mupro.hcm.sonification.fragments.MapFragment;
 import mupro.hcm.sonification.preferences.PreferencesActivity;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 
-import static mupro.hcm.sonification.MainActivity.BROADCAST_ACTION;
+import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
+import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
 
 public class DataActivity extends AppCompatActivity {
     private static final String TAG = DataActivity.class.getName();
@@ -71,10 +73,10 @@ public class DataActivity extends AppCompatActivity {
         Intent intent = getIntent();
         AsyncTask.execute(() -> {
             mDataSet = AppDatabase.getDatabase(this).dataSetDao()
-                    .getById(intent.getLongExtra("DATASET_ID", -1));
+                    .getById(intent.getLongExtra(EXTRA_DATASETID, -1));
             toolbarTitle.setText(mDataSet.getName());
 
-            long currDataSetId = getSharedPreferences("DATA", MODE_PRIVATE)
+            long currDataSetId = PreferenceManager.getDefaultSharedPreferences(this)
                     .getLong(CURRENT_DATASET, -1);
 
             if (mDataSet.getId() == currDataSetId) {
@@ -147,7 +149,7 @@ public class DataActivity extends AppCompatActivity {
 
     private void registerReceiver() {
         mSensorDataReceiver = new SensorDataReceiver(this::receivedData);
-        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
+        IntentFilter intentFilter = new IntentFilter(ACTION_BROADCAST);
         registerReceiver(mSensorDataReceiver, intentFilter);
         Log.i(TAG, "Registered SensorDataReceiver");
     }

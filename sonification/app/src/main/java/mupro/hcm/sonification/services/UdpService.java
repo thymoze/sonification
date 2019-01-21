@@ -17,10 +17,9 @@ import java.time.Instant;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.SensorDataHelper;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- */
+import static mupro.hcm.sonification.MainActivity.EXTRA_UDPRECEIVER;
+
+
 public class UdpService extends IntentService {
 
     private static final String TAG = UdpService.class.getName();
@@ -39,7 +38,7 @@ public class UdpService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        receiver = intent.getParcelableExtra("receiver");
+        receiver = intent.getParcelableExtra(EXTRA_UDPRECEIVER);
 
         if (!running) {
             Log.i(TAG, "Starting UdpService.");

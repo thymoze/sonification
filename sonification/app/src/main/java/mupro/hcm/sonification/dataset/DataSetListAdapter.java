@@ -2,6 +2,8 @@ package mupro.hcm.sonification.dataset;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,9 @@ import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.DataSet;
+
+import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
+import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
 
 public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.ViewHolder> {
 
@@ -57,7 +62,7 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
 
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
-                intent.putExtra("DATASET_ID", current.getId());
+                intent.putExtra(EXTRA_DATASETID, current.getId());
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(mContext, viewHolder.title, "dataset_title");
                 mContext.startActivity(intent, options.toBundle());
             });
