@@ -7,9 +7,9 @@ import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import mupro.hcm.sonification.R;
-import mupro.hcm.sonification.utils.Direction;
-import mupro.hcm.sonification.utils.Sound;
-import mupro.hcm.sonification.utils.SoundQueue;
+import mupro.hcm.sonification.sound.Direction;
+import mupro.hcm.sonification.sound.Sound;
+import mupro.hcm.sonification.sound.SoundQueue;
 
 public class SoundsPreferencesFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 

@@ -3,16 +3,19 @@ package mupro.hcm.sonification.fragments;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -23,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
@@ -45,7 +49,7 @@ public class MapsBottomSheetFragment extends Fragment {
     LinearLayout cardPlaceholder;
 
     @BindView(R.id.delete_button)
-    ImageView deleteButton;
+    ImageButton deleteButton;
 
     public MapsBottomSheetFragment() {
     }
@@ -73,34 +77,34 @@ public class MapsBottomSheetFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_maps_bottom_sheet, container, false);
         ButterKnife.bind(this, view);
 
-        bottomSheetTitle.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy - hh:mm").format(LocalDateTime.ofInstant(mSensorData.getTimestamp(), ZoneOffset.UTC)));
+        bottomSheetTitle.setText(mSensorData.getTimestamp()
+                .atZone(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern("dd.MM.YYYY HH:mm")));
 
         // disable delete button if service is running
-        if (getContext().getSharedPreferences("DATA", MODE_PRIVATE)
+        if (PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getLong(CURRENT_DATASET, -1) != -1) {
             deleteButton.setClickable(false);
             deleteButton.setVisibility(View.INVISIBLE);
         }
 
         setupDataPresentation();
-        setupDeleteHandler();
 
         return view;
     }
 
-    private void setupDeleteHandler() {
-        deleteButton.setOnClickListener((click) -> {
-            new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog)
-                    .setTitle(R.string.confirm_sensordata_delete_title)
-                    .setMessage(R.string.confirm_sensordata_delete_content)
-                    .setPositiveButton("Ja", (dialog, whichButton) -> {
-                        AsyncTask.execute(() -> AppDatabase.getDatabase(getContext()).sensorDataDao().delete(mSensorData));
-                        ((MapFragment) getParentFragment()).updateMap();
+    @OnClick(R.id.delete_button)
+    void onDeleteButtonClicked() {
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.confirm_sensordata_delete_title)
+                .setMessage(R.string.confirm_sensordata_delete_content)
+                .setPositiveButton("Ja", (dialog, whichButton) -> {
+                    AsyncTask.execute(() -> AppDatabase.getDatabase(getContext()).sensorDataDao().delete(mSensorData));
+                    ((MapFragment) getParentFragment()).updateMap();
 
-                        Toast.makeText(getContext(), R.string.delete_successful, Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Nein", null).show();
-        });
+                    Toast.makeText(getContext(), R.string.delete_successful, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Nein", null).show();
     }
 
     private void setupDataPresentation() {

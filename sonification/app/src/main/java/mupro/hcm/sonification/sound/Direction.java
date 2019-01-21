@@ -1,4 +1,4 @@
-package mupro.hcm.sonification.utils;
+package mupro.hcm.sonification.sound;
 
 public enum Direction {
     UP("up"),

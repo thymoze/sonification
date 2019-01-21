@@ -15,8 +15,8 @@ import androidx.annotation.Nullable;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
-import mupro.hcm.sonification.utils.Direction;
-import mupro.hcm.sonification.utils.SoundQueue;
+import mupro.hcm.sonification.sound.Direction;
+import mupro.hcm.sonification.sound.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 
