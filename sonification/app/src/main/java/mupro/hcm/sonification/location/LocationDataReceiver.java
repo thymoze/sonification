@@ -3,6 +3,7 @@ package mupro.hcm.sonification.location;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 
+import static mupro.hcm.sonification.MainActivity.EXTRA_SENSORDATA;
+
 public class LocationDataReceiver extends BroadcastReceiver {
 
     private static final String TAG = LocationDataReceiver.class.getName();
@@ -20,15 +23,11 @@ public class LocationDataReceiver extends BroadcastReceiver {
     double lastLongitude;
     double distance = 0;
 
-    private Function<SensorData, Void> callback;
-
-    public LocationDataReceiver(Function<SensorData, Void> function) {
-        callback = function;
-    }
+    public LocationDataReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SensorData data = (SensorData) intent.getSerializableExtra("sensorData");
+        SensorData data = (SensorData) intent.getSerializableExtra(EXTRA_SENSORDATA);
         Log.i(TAG, "Received LocationData");
 
         if(lastLatitude == 0) {
@@ -37,29 +36,33 @@ public class LocationDataReceiver extends BroadcastReceiver {
         }
 
         distance = distance + calcDistance(lastLatitude, lastLongitude, data.getLatitude(), data.getLongitude());
+        Log.i(TAG, "New distance: " + distance);
 
-        AppDatabase.getDatabase(context).dataSetDao().setDistanceforId(distance, data.getId());
+        AsyncTask.execute(() -> {
+            AppDatabase.getDatabase(context).dataSetDao().setDistanceforId(distance, data.getDataSetId());
+            Log.i(TAG, "Saved distance to db");
+        });
 
         lastLatitude = data.getLatitude();
         lastLongitude = data.getLongitude();
-
-        callback.apply(data);
     }
 
-    private void calcDistanceDB(Context context, int id) {
-        double distance = 0;
-        SensorData a;
-        SensorData b;
-        List<SensorData> sensorData = AppDatabase.getDatabase(context).sensorDataDao().getSensorDataForDataSet(id);
-        a = sensorData.get(0);
+    public void calcDistanceDB(Context context, long id) {
+        AsyncTask.execute(() -> {
+            double distance = 0;
+            List<SensorData> sensorData = AppDatabase.getDatabase(context).sensorDataDao().getSensorDataForDataSet(id);
 
-        for (SensorData element : sensorData) {
-            b = element;
-            distance += calcDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());
-            a = element;
-        }
+            if (!sensorData.isEmpty()) {
+                SensorData a = sensorData.get(0);
 
-        AppDatabase.getDatabase(context).dataSetDao().setDistanceforId(distance, id);
+                for (SensorData b : sensorData) {
+                    distance += calcDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());
+                    a = b;
+                }
+            }
+
+            AppDatabase.getDatabase(context).dataSetDao().setDistanceforId(distance, id);
+        });
     }
 
     private double calcDistance(double lat1, double lon1, double lat2, double lon2) {

@@ -9,14 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,9 +27,9 @@ import butterknife.OnClick;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.location.LocationDataReceiver;
 import mupro.hcm.sonification.sensors.Sensor;
 
-import static android.content.Context.MODE_PRIVATE;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 
 public class MapsBottomSheetFragment extends Fragment {
@@ -41,6 +38,7 @@ public class MapsBottomSheetFragment extends Fragment {
     private static final String ARG_SENSORDATA = TAG.concat("sensordata");
 
     private SensorData mSensorData;
+    private OnDataPointDeleteListener callback;
 
     @BindView(R.id.bottom_sheet_title)
     TextView bottomSheetTitle;
@@ -60,6 +58,10 @@ public class MapsBottomSheetFragment extends Fragment {
         args.putSerializable(ARG_SENSORDATA, sensorData);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setOnDataPointDeleteListener(OnDataPointDeleteListener callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -101,6 +103,9 @@ public class MapsBottomSheetFragment extends Fragment {
                 .setPositiveButton("Ja", (dialog, whichButton) -> {
                     AsyncTask.execute(() -> AppDatabase.getDatabase(getContext()).sensorDataDao().delete(mSensorData));
                     ((MapFragment) getParentFragment()).updateMap();
+                    new LocationDataReceiver().calcDistanceDB(getContext(), mSensorData.getDataSetId());
+
+                    callback.onDataPointDelete(mSensorData);
 
                     Toast.makeText(getContext(), R.string.delete_successful, Toast.LENGTH_SHORT).show();
                 })
@@ -128,5 +133,9 @@ public class MapsBottomSheetFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    public interface OnDataPointDeleteListener {
+        void onDataPointDelete(SensorData deleted);
     }
 }

@@ -30,6 +30,7 @@ import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.fragments.ChartsFragment;
 import mupro.hcm.sonification.fragments.MapFragment;
+import mupro.hcm.sonification.location.LocationDataReceiver;
 import mupro.hcm.sonification.preferences.PreferencesActivity;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 
@@ -37,7 +38,7 @@ import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
 
-public class DataActivity extends AppCompatActivity {
+public class DataActivity extends AppCompatActivity implements MapFragment.OnDataPointDeleteListener {
     private static final String TAG = DataActivity.class.getName();
 
     @BindView(R.id.data_activity_toolbar)
@@ -54,9 +55,9 @@ public class DataActivity extends AppCompatActivity {
     private ChartsFragment mChartsFragment;
     private MapFragment mMapFragment;
     private SensorDataReceiver mSensorDataReceiver;
+    private LocationDataReceiver mLocationDataReceiver;
 
     private DataSet mDataSet;
-    private LiveData<List<SensorData>> mSensorData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class DataActivity extends AppCompatActivity {
                     .getLong(CURRENT_DATASET, -1);
 
             if (mDataSet.getId() == currDataSetId) {
-                registerReceiver();
+                registerReceivers();
             }
         });
 
@@ -95,8 +96,10 @@ public class DataActivity extends AppCompatActivity {
                             mChartsFragment = ChartsFragment.newInstance(mDataSet.getId());
                         return mChartsFragment;
                     case 1:
-                        if (mMapFragment == null)
+                        if (mMapFragment == null) {
                             mMapFragment = MapFragment.newInstance(mDataSet.getId());
+                            mMapFragment.setOnDataPointDeleteListener(DataActivity.this);
+                        }
                         return mMapFragment;
                 }
             }
@@ -145,11 +148,16 @@ public class DataActivity extends AppCompatActivity {
         if (mSensorDataReceiver != null) {
             unregisterReceiver(mSensorDataReceiver);
         }
+
+        if (mLocationDataReceiver != null) {
+            unregisterReceiver(mLocationDataReceiver);
+        }
     }
 
-    private void registerReceiver() {
-        mSensorDataReceiver = new SensorDataReceiver(this::receivedData);
+    private void registerReceivers() {
         IntentFilter intentFilter = new IntentFilter(ACTION_BROADCAST);
+
+        mSensorDataReceiver = new SensorDataReceiver(this::receivedData);
         registerReceiver(mSensorDataReceiver, intentFilter);
         Log.i(TAG, "Registered SensorDataReceiver");
     }
@@ -160,5 +168,11 @@ public class DataActivity extends AppCompatActivity {
         mMapFragment.addMarker(sensorData);
         Log.i(TAG, "Charts and Map updated.");
         return null;
+    }
+
+    @Override
+    public void onDataPointDelete(SensorData deleted) {
+        Log.i(TAG, "Removing entry from charts...");
+        mChartsFragment.updateCharts(deleted);
     }
 }

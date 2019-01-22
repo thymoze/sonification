@@ -178,6 +178,46 @@ public class ChartCardFragment extends Fragment {
         return set;
     }
 
+    public boolean chartContainsEntry(Instant x) {
+        float xx = Float.intBitsToFloat((int) x.getEpochSecond());
+
+        LineData data = chart.getData();
+
+        if (data == null) {
+            return false;
+        }
+
+        LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
+
+        if (set == null)
+            return false;
+
+        return !set.getEntriesForXValue(xx).isEmpty();
+    }
+
+    public boolean removeEntryFromChart(Instant x) {
+        float xx = Float.intBitsToFloat((int) x.getEpochSecond());
+
+        LineData data = chart.getData();
+
+        if (data == null) {
+            return false;
+        }
+
+        LineDataSet set = (LineDataSet) data.getDataSetByIndex(0);
+
+        if (set == null)
+            return false;
+
+        boolean removed = set.removeEntryByXValue(xx);
+        if (set.getEntryCount() == 0) {
+            data.removeDataSet(0);
+            chart.setData(null);
+        }
+        chart.invalidate();
+        return removed;
+    }
+
     public void addEntryToChart(Instant x, float y) {
         LineData data = chart.getData();
 

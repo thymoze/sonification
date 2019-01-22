@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorData;
+import mupro.hcm.sonification.location.LocationDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
@@ -56,6 +58,7 @@ public class DataService extends Service {
     private Location mLocation;
 
     private UdpDataReceiver mUdpDataReceiver;
+    private LocationDataReceiver mLocationDataReceiver;
 
     @Override
     public void onCreate() {
@@ -99,6 +102,11 @@ public class DataService extends Service {
         startSonification();
         startUdpReceiver();
 
+        IntentFilter intentFilter = new IntentFilter(ACTION_BROADCAST);
+        mLocationDataReceiver = new LocationDataReceiver();
+        registerReceiver(mLocationDataReceiver, intentFilter);
+        Log.i(TAG, "Registered LocationDataReceiver");
+
         return START_NOT_STICKY;
     }
 
@@ -119,6 +127,10 @@ public class DataService extends Service {
 
         stopUdpReceiver();
         stopSonification();
+
+        if (mLocationDataReceiver != null) {
+            unregisterReceiver(mLocationDataReceiver);
+        }
 
         mNotificationManager.deleteNotificationChannel(CHANNEL_ID);
     }

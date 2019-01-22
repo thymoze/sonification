@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -122,7 +123,16 @@ public class ChartsFragment extends Fragment {
             if (fragment != null) {
                 Double val = data.get(Sensor.fromId(s));
                 if (val != null) {
-                    fragment.addEntryToChart(data.getTimestamp(), val.floatValue());
+                    Instant x = data.getTimestamp();
+                    float y = val.floatValue();
+                    if (fragment.chartContainsEntry(x)) {
+                        Log.i(TAG, "updateCharts remove");
+                        boolean removed = fragment.removeEntryFromChart(x);
+                        Log.i(TAG, removed ? "Datapoint removed" : "Removing failed.");
+                    } else {
+                        Log.i(TAG, "updateCharts insert");
+                        fragment.addEntryToChart(x, y);
+                    }
                 } else {
                     Log.e(TAG, "val is null: " + s);
                 }

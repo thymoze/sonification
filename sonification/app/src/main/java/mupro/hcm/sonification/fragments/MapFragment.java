@@ -47,7 +47,7 @@ import mupro.hcm.sonification.database.SensorDataDao;
  * create an instance of this fragment.
  */
 public class MapFragment extends Fragment implements
-        GoogleMap.OnMarkerClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
+        GoogleMap.OnMarkerClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, MapsBottomSheetFragment.OnDataPointDeleteListener {
     private static final String TAG = MapFragment.class.getName();
     private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
 
@@ -59,6 +59,8 @@ public class MapFragment extends Fragment implements
     private BottomSheetBehavior mBottomSheetBehavior;
     private Marker mCurrentMarker;
     private LinkedList<Marker> markers;
+
+    private OnDataPointDeleteListener callback;
 
     @BindView(R.id.bottom_sheet_placeholder)
     FrameLayout bottomSheet;
@@ -72,6 +74,11 @@ public class MapFragment extends Fragment implements
         args.putLong(ARG_DATASET_ID, dataSetId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+
+    public void setOnDataPointDeleteListener(OnDataPointDeleteListener callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -157,6 +164,7 @@ public class MapFragment extends Fragment implements
         // add a new bottom sheet with the marker information (replacing the previous one)
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         MapsBottomSheetFragment fragment = MapsBottomSheetFragment.newInstance(((SensorData) marker.getTag()));
+        fragment.setOnDataPointDeleteListener(this);
         transaction.replace(R.id.bottom_sheet_placeholder, fragment);
         transaction.commit();
 
@@ -177,6 +185,11 @@ public class MapFragment extends Fragment implements
         // bottom sheet should be hidden if the map is clicked
         if (mBottomSheetBehavior != null)
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    @Override
+    public void onDataPointDelete(SensorData deleted) {
+        callback.onDataPointDelete(deleted);
     }
 
     private static class loadFromDbTask extends AsyncTask<Long, SensorData, Void> {
@@ -236,5 +249,9 @@ public class MapFragment extends Fragment implements
         // bottom sheet should be hidden if the map is clicked
         if (mBottomSheetBehavior != null)
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public interface OnDataPointDeleteListener {
+        void onDataPointDelete(SensorData deleted);
     }
 }
