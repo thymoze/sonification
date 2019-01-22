@@ -31,6 +31,9 @@ public interface DataSetDao {
     @TypeConverters(AppDatabase.class)
     Instant getTimestampById(int id);
 
+    @Query("UPDATE DataSet SET distanceInKm = :distance WHERE id = :id")
+    void setDistanceforId(double distance, long id);
+
     @Insert
     long insert(DataSet data);
 
