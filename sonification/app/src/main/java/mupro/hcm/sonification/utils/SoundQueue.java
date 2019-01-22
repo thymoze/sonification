@@ -62,6 +62,14 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
         }
     }
 
+    public void playSoundForParticleSensor(Direction direction) {
+        String instrument = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("pm_preference", null);
+        if (instrument != null) {
+            playSound(new Sound(instrument, direction));
+        }
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         playing = false;
