@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,6 +72,7 @@ public class SonificationService extends Service {
         if (mSensorDataReceiver != null) {
             unregisterReceiver(mSensorDataReceiver);
         }
+        soundQueue.release();
     }
 
     @Nullable
@@ -95,6 +97,7 @@ public class SonificationService extends Service {
         counter++;
         Log.i(TAG, "Counter: " + counter);
 
+        // get selected sensors from the preferences
         Set<Sensor> sensorPreference = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("sensors_preference",
                 Arrays.stream(Sensor.values())
                         .map(Sensor::getId)
@@ -176,10 +179,10 @@ public class SonificationService extends Service {
             mediansOfCurrentSensor.removeFirst();
             mediansOfCurrentSensor.add(sensorData.get(sensor));
 
-            Log.i(TAG, "Size: " + mediansOfCurrentSensor.size());
-
-            Collections.sort(mediansOfCurrentSensor);
-            currentMedians[sensorIndex] = mediansOfCurrentSensor.get(NUM_SAMPLES / 2);
+            // we need to make a deep copy so the original list is not affected by the sorting
+            List<Double> deepCopy = new ArrayList<>(mediansOfCurrentSensor);
+            Collections.sort(deepCopy);
+            currentMedians[sensorIndex] = deepCopy.get(NUM_SAMPLES / 2);
 
             // play sound if median increases by PERCENTAGE
             if (sensor != Sensor.PM10 && sensor != Sensor.PM25) {
