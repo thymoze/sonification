@@ -16,6 +16,7 @@ public class DataSet {
     private long id;
 
     private String name;
+    private double distanceInKm;
 
     @TypeConverters(AppDatabase.class)
     private Instant timestamp;
@@ -48,6 +49,10 @@ public class DataSet {
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
+
+    public double getDistanceInKm() { return this.distanceInKm; }
+
+    public void setDistanceInKm(double distanceInKm) { this.distanceInKm = distanceInKm; }
 
     @NonNull
     @Override

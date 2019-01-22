@@ -21,6 +21,7 @@ import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.DataSet;
+import mupro.hcm.sonification.location.LocationDataReceiver;
 
 public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.ViewHolder> {
 
@@ -53,7 +54,7 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
             viewHolder.timestamp.setText(current.getTimestamp()
                     .atZone(ZoneId.systemDefault())
                     .format(DateTimeFormatter.ofPattern("dd. MMM YYYY HH:mm")));
-            viewHolder.distance.setText("x.x km");
+            viewHolder.distance.setText(current.getDistanceInKm() + " km");
 
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
