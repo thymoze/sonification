@@ -301,6 +301,8 @@ public class MainActivity extends AppCompatActivity {
 
         invalidateOptionsMenu();
         startNewButton.setVisibility(View.VISIBLE);
+
+        mDataSetListAdapter.notifyDataSetChanged();
     }
 
     private void checkPermissions() {

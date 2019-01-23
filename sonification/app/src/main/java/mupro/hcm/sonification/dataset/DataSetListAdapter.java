@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.time.ZoneId;
@@ -59,7 +60,17 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
             viewHolder.timestamp.setText(current.getTimestamp()
                     .atZone(ZoneId.systemDefault())
                     .format(DateTimeFormatter.ofPattern("dd. MMM YYYY HH:mm")));
-            viewHolder.distance.setText(current.getDistanceInKm() + " km");
+            double distanceInKm = current.getDistanceInKm();
+            if (distanceInKm < 1) {
+                viewHolder.distance.setText(String.format("%.0f m", distanceInKm * 1000));
+            } else {
+                viewHolder.distance.setText(String.format("%.3f km", distanceInKm));
+            }
+
+            if (current.getId() == PreferenceManager.getDefaultSharedPreferences(mContext)
+                    .getLong(CURRENT_DATASET, -1)) {
+                viewHolder.dataset_active.setVisibility(View.VISIBLE);
+            }
 
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
@@ -122,6 +133,8 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
         public TextView timestamp;
         @BindView(R.id.dataset_distance)
         public TextView distance;
+        @BindView(R.id.dataset_active_indicator)
+        public ProgressBar dataset_active;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

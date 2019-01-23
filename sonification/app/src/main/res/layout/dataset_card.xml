@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
@@ -15,6 +16,18 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="16dp">
 
+        <ProgressBar
+            android:id="@+id/dataset_active_indicator"
+            android:layout_width="32dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="4dp"
+            android:paddingEnd="8dp"
+            android:indeterminateOnly="true"
+            android:indeterminateTint="@color/on_primary"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/dataset_title"
             android:layout_width="wrap_content"
@@ -22,7 +35,7 @@
             android:textColor="@color/on_surface"
             android:textSize="24sp"
             android:transitionName="dataset_title"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/dataset_active_indicator"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
