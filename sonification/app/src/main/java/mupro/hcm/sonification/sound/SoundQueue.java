@@ -11,17 +11,17 @@ import java.util.LinkedList;
 
 import mupro.hcm.sonification.sensors.Sensor;
 
-public class SoundQueue implements MediaPlayer.OnCompletionListener {
+public class SoundQueue extends MediaPlayer implements MediaPlayer.OnCompletionListener {
 
     private final String TAG = "SoundQueue";
     private Context context;
     private LinkedList<Sound> playlist;
-    private boolean playing = false;
 
     public SoundQueue(Context context) {
         super();
         playlist = new LinkedList<>();
         this.context = context;
+        setOnCompletionListener(this);
     }
 
     /**
@@ -31,21 +31,17 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
      */
     public void playSound(final Sound sound) {
         String fileName = "sounds/" + sound.getInstrument().toLowerCase() + "-" + sound.getDirection().getId() + ".mp3";
-        if (!playing) {
-            playing = true;
-            new Thread(() -> {
-                try {
-                    Log.i(TAG, "Playing: " + fileName);
-                    MediaPlayer player = new MediaPlayer();
-                    player.setOnCompletionListener(this);
-                    AssetFileDescriptor afd = context.getAssets().openFd(fileName);
-                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                    player.prepare();
-                    player.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+        if (!isPlaying()) {
+            try {
+                Log.i(TAG, "Playing: " + fileName);
+                AssetFileDescriptor afd = context.getAssets().openFd(fileName);
+                setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                prepare();
+                setLooping(false);
+                start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             Log.i(TAG, "Queued: " + fileName);
             playlist.add(sound);
@@ -60,11 +56,17 @@ public class SoundQueue implements MediaPlayer.OnCompletionListener {
         }
     }
 
+    public void playSoundForParticleSensor(Direction direction) {
+        String instrument = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("pm_preference", null);
+        if (instrument != null) {
+            playSound(new Sound(instrument, direction));
+        }
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
-        playing = false;
-        mp.stop();
-        mp.release();
+        reset();
 
         // Play the rest of the sounds currently queued up
         if (playlist.size() > 0) {

@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         setSupportActionBar(toolbar);
 
         setUpRecyclerView();

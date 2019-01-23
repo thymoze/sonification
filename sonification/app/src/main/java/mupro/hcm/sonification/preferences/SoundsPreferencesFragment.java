@@ -32,8 +32,10 @@ public class SoundsPreferencesFragment extends PreferenceFragmentCompat implemen
         ListPreference preference = (ListPreference) findPreference(key);
         if (preference != null) {
             SoundQueue queue = new SoundQueue(getContext());
-            queue.playSound(new Sound(preference.getValue(), Direction.UP));
-            queue.playSound(new Sound(preference.getValue(), Direction.DOWN));
+            if (preference.getValue() != null) {
+                queue.playSound(new Sound(preference.getValue(), Direction.UP));
+                queue.playSound(new Sound(preference.getValue(), Direction.DOWN));
+            }
         }
     }
 }
