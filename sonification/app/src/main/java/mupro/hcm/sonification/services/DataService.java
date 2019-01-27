@@ -224,6 +224,11 @@ public class DataService extends Service {
 
             Toast.makeText(DataService.this, "Data received!", Toast.LENGTH_SHORT).show();
 
+            if (mLocation == null) {
+                // just drop the data if there is no location yet...
+                return;
+            }
+
             data.setLatitude(mLocation.getLatitude());
             data.setLongitude(mLocation.getLongitude());
 

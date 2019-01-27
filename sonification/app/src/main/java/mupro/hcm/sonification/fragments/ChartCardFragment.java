@@ -1,13 +1,15 @@
 package mupro.hcm.sonification.fragments;
 
 
-import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -28,8 +30,10 @@ import java.util.List;
 
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorDataDao;
@@ -79,16 +83,6 @@ public class ChartCardFragment extends Fragment {
         loadFromDb();
 
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     public long getDataSetId() {
@@ -244,16 +238,7 @@ public class ChartCardFragment extends Fragment {
         //chart.setVisibleXRangeMaximum(20);
         //chart.setVisibleYRangeMaximum(15, AxisDependency.LEFT);
 
-        // this automatically refreshes the chart (calls invalidate())
-        if (set.getEntryCount() >= 20 && false) {
-            int offset = set.getEntryCount() - 20;
-            float offsetX = set.getEntryForIndex(offset).getX();
-            chart.setVisibleXRangeMaximum(20);
-            chart.moveViewToX(offsetX);
-            chart.setVisibleXRangeMaximum(set.getEntryCount());
-        } else {
-            chart.invalidate();
-        }
+        chart.invalidate();
     }
 
     private static class loadFromDbTask extends AsyncTask<Pair<String, Long>, Pair<Instant, Double>, Void> {

@@ -11,7 +11,9 @@
         android:layout_height="match_parent"
         android:layout_marginHorizontal="@dimen/charts_card_horizontal_margin"
         android:layout_marginTop="1dp"
-        android:layout_marginBottom="@dimen/charts_card_vertical_margin">
+        android:layout_marginBottom="@dimen/charts_card_vertical_margin"
+        app:cardCornerRadius="@dimen/dataset_card_radius"
+        app:cardElevation="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

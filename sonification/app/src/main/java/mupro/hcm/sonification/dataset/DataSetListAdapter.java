@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.preference.PreferenceManager;
+import android.service.autofill.Dataset;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,9 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
 
     private static final String TAG = DataSetListAdapter.class.getName();
 
+    private static final int TYPE_INACTIVE = 0;
+    private static final int TYPE_ACTIVE = 1;
+
     private MainActivity mContext;
     // Cached copy of DataSets
     private List<DataSet> mDataSets;
@@ -42,6 +46,15 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     public DataSetListAdapter(MainActivity context) {
         mContext = context;
         mDataSets = new ArrayList<>();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mDataSets.get(position).getId() == PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getLong(CURRENT_DATASET, -1))
+            return TYPE_ACTIVE;
+        else
+            return TYPE_INACTIVE;
     }
 
     @NonNull
@@ -67,10 +80,10 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
                 viewHolder.distance.setText(String.format("%.3f km", distanceInKm));
             }
 
-            if (current.getId() == PreferenceManager.getDefaultSharedPreferences(mContext)
-                    .getLong(CURRENT_DATASET, -1)) {
+            if (getItemViewType(position) == TYPE_ACTIVE)
                 viewHolder.dataset_active.setVisibility(View.VISIBLE);
-            }
+            else
+                viewHolder.dataset_active.setVisibility(View.GONE);
 
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
