@@ -23,6 +23,7 @@
 
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>
+    <string name="no_chart_data">Chart enthält keine Daten.</string>
 
     <string name="pm">Feinstaub (kombiniert)</string>
     <string name="pm25">Feinstaub 2.5</string>

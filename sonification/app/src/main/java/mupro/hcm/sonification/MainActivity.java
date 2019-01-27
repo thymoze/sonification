@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         startForegroundService(intent);
 
         invalidateOptionsMenu();
-        startNewButton.setVisibility(View.INVISIBLE);
+        startNewButton.setVisibility(View.GONE);
     }
 
     private void stopDataService() {

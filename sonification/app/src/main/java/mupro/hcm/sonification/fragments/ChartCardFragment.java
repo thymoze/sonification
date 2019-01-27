@@ -30,6 +30,7 @@ import java.util.List;
 
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
+import butterknife.BindColor;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +49,11 @@ public class ChartCardFragment extends Fragment {
     LineChart chart;
     @BindView(R.id.label)
     TextView label;
+
+    @BindColor(R.color.error)
+    int chart_empty_color;
+    @BindColor(R.color.secondary_variant)
+    int chart_color;
 
     private String mSensorId;
     private long mDataSetId;
@@ -120,9 +126,13 @@ public class ChartCardFragment extends Fragment {
 
         chart.getLegend().setEnabled(false);
 
+        chart.setNoDataText(getResources().getString(R.string.no_chart_data));
+        chart.setNoDataTextColor(chart_empty_color);
+
+        chart.setBackgroundResource(R.color.surface);
 
         IAxisValueFormatter xAxisFormatter = new IAxisValueFormatter() {
-            private DateTimeFormatter mFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+            private DateTimeFormatter mFormat = DateTimeFormatter.ofPattern("HH:mm");
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
@@ -162,9 +172,9 @@ public class ChartCardFragment extends Fragment {
         set.setDrawValues(false);
         set.setCircleRadius(1f);
         set.setCircleColor(Color.BLACK);
-        //set.setHighLightColor(Color.BLUE);
-        set.setColor(Color.rgb(104, 241, 175));
-        set.setFillColor(Color.rgb(104, 241, 175));
+        set.setHighlightEnabled(false);
+        set.setColor(chart_color);
+        set.setFillColor(chart_color);
         set.setFillAlpha(255);
         set.setDrawHorizontalHighlightIndicator(false);
         set.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
