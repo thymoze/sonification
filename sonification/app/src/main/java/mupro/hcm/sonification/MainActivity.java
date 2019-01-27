@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -279,10 +280,11 @@ public class MainActivity extends AppCompatActivity {
                     inputLayout.setError(getResources().getString(R.string.enter_name));
                 }
             });
-            input.requestFocus();
         });
 
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
+        input.requestFocus();
     }
 
     private void startDataService() {
