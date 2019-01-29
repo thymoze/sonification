@@ -90,8 +90,10 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
             }
 
             if (getItemViewType(position) == TYPE_ACTIVE) {
+                viewHolder.dataset_activity_indicator.setVisibility(View.VISIBLE);
                 viewHolder.dataset_icon.startAnimation(blinkAnimation);
             } else {
+                viewHolder.dataset_activity_indicator.setVisibility(View.INVISIBLE);
                 viewHolder.dataset_icon.clearAnimation();
             }
 
@@ -158,6 +160,8 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
         public TextView distance;
         @BindView(R.id.dataset_icon)
         public ImageView dataset_icon;
+        @BindView(R.id.dataset_activity_indicator)
+        public View dataset_activity_indicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
