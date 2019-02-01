@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,7 +22,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.lang.ref.WeakReference;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -243,8 +241,6 @@ public class MapFragment extends Fragment implements
         // remove marker
         markers.remove(index);
         mCurrentMarker.remove();
-
-        // TODO: recalculate distance
 
         // bottom sheet should be hidden if the map is clicked
         if (mBottomSheetBehavior != null)

@@ -5,8 +5,8 @@
 
     <MultiSelectListPreference
         android:key="sensors_preference"
-        app:title="@string/title_charts"
-        android:summary="@string/display_charts"
+        app:title="@string/active_sensors"
+        android:summary="@string/sensors_description"
         android:icon="@drawable/ic_charts_black_24dp" />
 
     <Preference
@@ -14,4 +14,10 @@
         android:icon="@drawable/music_note"
         app:summary="@string/map_sensor_sound"
         app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
+
+    <Preference
+        app:title="@string/title_about"
+        android:icon="@drawable/information"
+        app:summary="@string/about_summary"
+        app:fragment="mupro.hcm.sonification.preferences.AboutPreferenceFragment" />
 </PreferenceScreen>

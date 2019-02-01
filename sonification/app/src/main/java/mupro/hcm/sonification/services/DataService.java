@@ -181,7 +181,7 @@ public class DataService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("The Sonification App is currently receiving in the background and tracking your position.")
+                .setContentText(getString(R.string.notification_content))
                 .setOngoing(true)
                 .setSmallIcon(R.drawable.music_note)
                 .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));

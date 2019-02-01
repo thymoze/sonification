@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 // check if all permissions are granted
                 if (report.areAllPermissionsGranted()) {
                     // All good
-                    Toast.makeText(getApplicationContext(), "Vielen Dank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.thanks), Toast.LENGTH_SHORT).show();
                     checkPermissions();
                 }
                 // check for permanent denial of any permission
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestGPSSettings() {
         Task<LocationSettingsResponse> task = createLocationSettingsTask();
-        task.addOnSuccessListener(this, locationSettingsResponse -> Toast.makeText(getApplicationContext(), "Vielen Dank!", Toast.LENGTH_SHORT).show());
+        task.addOnSuccessListener(this, locationSettingsResponse -> Toast.makeText(getApplicationContext(), getString(R.string.thanks), Toast.LENGTH_SHORT).show());
 
         task.addOnFailureListener(this, e -> {
             if (e instanceof ResolvableApiException) {

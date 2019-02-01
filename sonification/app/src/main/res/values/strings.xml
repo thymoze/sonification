@@ -5,6 +5,7 @@
     <string name="title_map">Map</string>
     <string name="title_sounds">Sounds</string>
 
+    <string name="thanks">Vielen Dank!</string>
     <string name="stop">Stop</string>
     <string name="poweroff">Herunterfahren</string>
     <string name="settings">Einstellungen</string>
@@ -14,9 +15,15 @@
     <string name="add">Hinzufügen</string>
     <string name="abort">Abbrechen</string>
 
-    <string name="background_service">Hintergrundservice</string>
-    <string name="display_charts">Anzuzeigende Charts</string>
+    <string name="active_sensors">Sensoren</string>
+    <string name="sensors_description">Von der App zu verarbeitende Sensoren</string>
     <string name="map_sensor_sound">Mapping zwischen Sensoren und Sounds</string>
+
+    <string name="title_about">About</string>
+    <string name="about_summary">Informationen zu Sonification</string>
+    <string name="about_text">Diese App wurde im Rahmen des Multimedia-Projekts im WS18/19 am Lehrstuhl \"Human Centered Multimedia\" der Universität Augsburg erstellt.</string>
+    <string name="team_info">Team:\nMerlin Albes, David Heim, Ralph Stuhler</string>
+    <string name="supervisor_info">Betreuer:\nHannes Ritschel, Andreas Seiderer</string>
 
     <string name="dataset_removed_message">Dataset %s wurde gelöscht.</string>
     <string name="undo">Rückgängig</string>
@@ -24,6 +31,9 @@
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>
     <string name="no_chart_data">Chart enthält keine Daten.</string>
+
+    <!-- Notification-->
+    <string name="notification_content">Die Sonification App empfängt Daten im Hintergrund und trackt Ihre Position.</string>
 
     <string name="pm">Feinstaub (kombiniert)</string>
     <string name="pm25">Feinstaub 2.5</string>
@@ -40,7 +50,6 @@
     <string name="pressure">Luftdruck</string>
     <string name="temperatureSHT">Temperatur (SHT)</string>
     <string name="temperatureBMP">Temperatur (BMP)</string>
-
 
     <string name="confirm_sensordata_delete_title">Messdaten löschen</string>
     <string name="confirm_sensordata_delete_content">Wollen Sie diese Messdaten wirklich löschen?</string>
