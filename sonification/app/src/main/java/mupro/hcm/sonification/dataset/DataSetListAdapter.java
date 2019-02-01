@@ -2,6 +2,7 @@ package mupro.hcm.sonification.dataset;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.preference.PreferenceManager;
 import android.service.autofill.Dataset;
@@ -9,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,6 +22,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindAnim;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.DataActivity;
@@ -37,6 +41,9 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     private static final int TYPE_INACTIVE = 0;
     private static final int TYPE_ACTIVE = 1;
 
+    @BindAnim(R.anim.blink_animation)
+    Animation blinkAnimation;
+
     private MainActivity mContext;
     // Cached copy of DataSets
     private List<DataSet> mDataSets;
@@ -46,6 +53,8 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     public DataSetListAdapter(MainActivity context) {
         mContext = context;
         mDataSets = new ArrayList<>();
+
+        ButterKnife.bind(this, context);
     }
 
     @Override
@@ -80,10 +89,13 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
                 viewHolder.distance.setText(String.format("%.3f km", distanceInKm));
             }
 
-            if (getItemViewType(position) == TYPE_ACTIVE)
-                viewHolder.dataset_active.setVisibility(View.VISIBLE);
-            else
-                viewHolder.dataset_active.setVisibility(View.GONE);
+            if (getItemViewType(position) == TYPE_ACTIVE) {
+                viewHolder.dataset_activity_indicator.setVisibility(View.VISIBLE);
+                viewHolder.dataset_icon.startAnimation(blinkAnimation);
+            } else {
+                viewHolder.dataset_activity_indicator.setVisibility(View.INVISIBLE);
+                viewHolder.dataset_icon.clearAnimation();
+            }
 
             viewHolder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, DataActivity.class);
@@ -146,8 +158,10 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
         public TextView timestamp;
         @BindView(R.id.dataset_distance)
         public TextView distance;
-        @BindView(R.id.dataset_active_indicator)
-        public ProgressBar dataset_active;
+        @BindView(R.id.dataset_icon)
+        public ImageView dataset_icon;
+        @BindView(R.id.dataset_activity_indicator)
+        public View dataset_activity_indicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
