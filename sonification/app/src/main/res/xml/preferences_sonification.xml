@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/title_sounds">
+
+    <ListPreference
+        android:defaultValue="@string/sliding_window"
+        android:entries="@array/sonificationTypes"
+        android:entryValues="@array/sonificationTypes"
+        android:summary="%s"
+        app:key="type_preference"
+        app:title="@string/sonification_type"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="5"
+        android:entries="@array/sample_size"
+        android:entryValues="@array/sample_size"
+        android:summary="%s"
+        app:key="sample_size"
+        app:title="@string/sample_size"
+        app:iconSpaceReserved="false"/>
+
+    <ListPreference
+        android:defaultValue="20"
+        android:entries="@array/percentage"
+        android:entryValues="@array/percentage"
+        android:summary="%s %%"
+        app:key="percentage"
+        app:title="@string/percentage"
+        app:iconSpaceReserved="false"/>
+</PreferenceScreen>

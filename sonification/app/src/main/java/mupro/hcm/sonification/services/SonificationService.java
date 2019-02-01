@@ -19,10 +19,12 @@ import java.util.stream.Collectors;
 
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
+import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 import mupro.hcm.sonification.sound.Direction;
+import mupro.hcm.sonification.sound.Sound;
 import mupro.hcm.sonification.sound.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;
@@ -37,9 +39,9 @@ public class SonificationService extends Service {
     private double currentMedians[];
     private SoundQueue soundQueue;
 
-    private final int PERCENTAGE = 10;
-    private final int NUM_SAMPLES = 3;
-    private final boolean SLIDING_WINDOW = true;
+    private int PERCENTAGE = 20; // default value 20
+    private int NUM_SAMPLES = 5; // default value 5
+    private boolean SLIDING_WINDOW = true; // default value true
 
     @Override
     public void onCreate() {
@@ -52,6 +54,8 @@ public class SonificationService extends Service {
         currentMedians = new double[Sensor.values().length];
         soundQueue = new SoundQueue(getBaseContext());
 
+        configureServiceWithPreferences();
+
         // add a list for each sensor
         Arrays.stream(Sensor.values()).forEach(e -> medianLists.add(new LinkedList<>()));
 
@@ -63,6 +67,27 @@ public class SonificationService extends Service {
         });
 
         registerReceiver();
+    }
+
+    private void configureServiceWithPreferences() {
+        String sampleSizePreference = android.preference.PreferenceManager.getDefaultSharedPreferences(this).getString("sample_size", null);
+        if (sampleSizePreference != null)
+            NUM_SAMPLES = Integer.parseInt(sampleSizePreference);
+
+        String percentagePreference = android.preference.PreferenceManager.getDefaultSharedPreferences(this).getString("percentage", null);
+        if (percentagePreference != null)
+            PERCENTAGE = Integer.parseInt(percentagePreference);
+
+        String typePreference = android.preference.PreferenceManager.getDefaultSharedPreferences(this).getString("type_preference", null);
+        if (typePreference != null && typePreference.equals(getString(R.string.frame))) {
+            SLIDING_WINDOW = false;
+        }
+
+        Log.i(TAG, "Sonification successfully configured.");
+        Log.i(TAG, "Sample Size: " + NUM_SAMPLES);
+        Log.i(TAG, "Percentage: " + PERCENTAGE);
+        Log.i(TAG, "Type: " + (SLIDING_WINDOW ? "Sliding Window" : "Frame"));
+        Log.i(TAG, "------------");
     }
 
     @Override

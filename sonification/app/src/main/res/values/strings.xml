@@ -15,8 +15,21 @@
     <string name="add">Hinzufügen</string>
     <string name="abort">Abbrechen</string>
 
+    <string name="dataset_removed_message">Dataset %s wurde gelöscht.</string>
+    <string name="undo">Rückgängig</string>
+
+    <string name="notification_content">Die Sonification App empfängt Daten im Hintergrund und trackt Ihre Position.</string>
+
+    <!-- Preferences -->
+    <string name="sonifcation_summary">Einstellungen zur Sonification</string>
+    <string name="sonification_type">Art der Sonification</string>
+    <string name="sliding_window">Sliding Window</string>
+    <string name="frame">Concurrent Frames</string>
+    <string name="percentage">Minmale Änderung</string>
+    <string name="sample_size">Anzahl der Samples</string>
+
     <string name="active_sensors">Sensoren</string>
-    <string name="sensors_description">Von der App zu verarbeitende Sensoren</string>
+    <string name="sensors_summary">Von der App zu verarbeitende Sensoren</string>
     <string name="map_sensor_sound">Mapping zwischen Sensoren und Sounds</string>
 
     <string name="title_about">About</string>
@@ -25,16 +38,11 @@
     <string name="team_info">Team:\nMerlin Albes, David Heim, Ralph Stuhler</string>
     <string name="supervisor_info">Betreuer:\nHannes Ritschel, Andreas Seiderer</string>
 
-    <string name="dataset_removed_message">Dataset %s wurde gelöscht.</string>
-    <string name="undo">Rückgängig</string>
-
     <!-- Charts -->
     <string name="no_charts">Keine Charts aktiviert.</string>
     <string name="no_chart_data">Chart enthält keine Daten.</string>
 
-    <!-- Notification-->
-    <string name="notification_content">Die Sonification App empfängt Daten im Hintergrund und trackt Ihre Position.</string>
-
+    <!-- Gases -->
     <string name="pm">Feinstaub (kombiniert)</string>
     <string name="pm25">Feinstaub 2.5</string>
     <string name="pm10">Feinstaub 10</string>
@@ -51,10 +59,12 @@
     <string name="temperatureSHT">Temperatur (SHT)</string>
     <string name="temperatureBMP">Temperatur (BMP)</string>
 
+    <!-- Maps marker delete -->
     <string name="confirm_sensordata_delete_title">Messdaten löschen</string>
     <string name="confirm_sensordata_delete_content">Wollen Sie diese Messdaten wirklich löschen?</string>
     <string name="delete_successful">Messdaten erfolgreich gelöscht!</string>
 
+    <!-- Sounds -->
     <string name="bass">Bass</string>
     <string name="bell"> Bell</string>
     <string name="bow">Bow</string>
