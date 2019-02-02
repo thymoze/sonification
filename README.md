@@ -7,7 +7,7 @@ Multimediaprojekt Uni Augsburg WS 2018/19.
 
 [Sonification App](/uploads/6cf328b6b4db1bb05e7591b5db3d58a8/Sonification.apk)
 
-~~[Dokumentation]() ~~
+~~Dokumentation~~
 
 ## Team
 
