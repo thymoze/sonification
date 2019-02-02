@@ -85,7 +85,7 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
             if (distanceInKm < 1) {
                 viewHolder.distance.setText(String.format("%.0f m", distanceInKm * 1000));
             } else {
-                viewHolder.distance.setText(String.format("%.3f km", distanceInKm));
+                viewHolder.distance.setText(String.format("%.2f km", distanceInKm));
             }
 
             if (getItemViewType(position) == TYPE_ACTIVE) {
