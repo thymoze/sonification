@@ -47,11 +47,11 @@ import mupro.hcm.sonification.database.SensorDataDao;
 public class MapFragment extends Fragment implements
         GoogleMap.OnMarkerClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, MapsBottomSheetFragment.OnDataPointDeleteListener {
     private static final String TAG = MapFragment.class.getName();
-    private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
+    private static final String ARG_DATASET_ID = TAG.concat(".dataset_id");
 
     private SupportMapFragment mSupportMapFragment;
     private GoogleMap mGoogleMap;
-    private List<Polyline> polylines;
+    private List<Polyline> mPolylines;
 
     private long mDataSetId;
     private BottomSheetBehavior mBottomSheetBehavior;
@@ -82,7 +82,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        polylines = new ArrayList<>();
+        mPolylines = new ArrayList<>();
         markers = new LinkedList<>();
         if (getArguments() != null) {
             mDataSetId = getArguments().getLong(ARG_DATASET_ID);
@@ -151,7 +151,7 @@ public class MapFragment extends Fragment implements
                     .add(end.getPosition());
             Polyline line = mGoogleMap.addPolyline(options);
             line.setZIndex(1000);
-            polylines.add(line);
+            mPolylines.add(line);
         }
     }
 
@@ -217,15 +217,15 @@ public class MapFragment extends Fragment implements
 
     public void updateMap() {
         // remove old polylines from that point
-        List<Polyline> adjLines = polylines.stream()
+        List<Polyline> adjLines = mPolylines.stream()
                 .flatMap(lines -> Stream.of(lines.getPoints())
                         .filter(latLng -> latLng.get(0).equals(mCurrentMarker.getPosition()) || latLng.get(1).equals(mCurrentMarker.getPosition()))
                         .limit(2)
                         .map(marker -> lines)).collect(Collectors.toList());
 
         Log.i(TAG, "Adj: " + adjLines.size());
-        Log.i(TAG, "All: " + polylines.size());
-        polylines.removeAll(adjLines);
+        Log.i(TAG, "All: " + mPolylines.size());
+        mPolylines.removeAll(adjLines);
         adjLines.forEach(Polyline::remove);
 
         int index = markers.indexOf(mCurrentMarker);

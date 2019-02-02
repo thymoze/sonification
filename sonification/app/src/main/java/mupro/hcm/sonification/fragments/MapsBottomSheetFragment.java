@@ -35,7 +35,7 @@ import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 public class MapsBottomSheetFragment extends Fragment {
 
     private static final String TAG = MapsBottomSheetFragment.class.getName();
-    private static final String ARG_SENSORDATA = TAG.concat("sensordata");
+    private static final String ARG_SENSORDATA = TAG.concat(".sensordata");
 
     private SensorData mSensorData;
     private OnDataPointDeleteListener callback;
@@ -49,8 +49,7 @@ public class MapsBottomSheetFragment extends Fragment {
     @BindView(R.id.delete_button)
     ImageButton deleteButton;
 
-    public MapsBottomSheetFragment() {
-    }
+    public MapsBottomSheetFragment() {}
 
     public static MapsBottomSheetFragment newInstance(SensorData sensorData) {
         MapsBottomSheetFragment fragment = new MapsBottomSheetFragment();

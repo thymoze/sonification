@@ -71,12 +71,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     private static final String PACKAGE = MainActivity.class.getPackage().getName();
 
+    // CONSTANTS
     public static final String ACTION_BROADCAST = PACKAGE.concat(".broadcast");
-
     public static final String EXTRA_SENSORDATA = PACKAGE.concat(".sensor_data");
     public static final String EXTRA_UDPRECEIVER = PACKAGE.concat(".receiver");
     public static final String EXTRA_DATASETID = PACKAGE.concat(".dataset_id");
-
     public static final String CURRENT_DATASET = "CURRENT_DATASET";
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -105,12 +104,12 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        setUpRecyclerView();
+        setupRecyclerView();
 
         checkPermissions();
     }
 
-    private void setUpRecyclerView() {
+    private void setupRecyclerView() {
         dataSetList.setHasFixedSize(true);
 
         mDataSetListLayoutManager = new LinearLayoutManager(this);
@@ -131,12 +130,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setUpItemTouchHelper();
+        setupItemTouchHelper();
     }
 
-    private void setUpItemTouchHelper() {
+    private void setupItemTouchHelper() {
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
-            Drawable trash = getDrawable(R.drawable.delete);
+            Drawable trash = getDrawable(R.drawable.ic_delete_white_24dp);
             int background = getResources().getColor(R.color.error, getTheme());
             float margin = getResources().getDimension(R.dimen.dataset_card_delete_margin);
             float radius = getResources().getDimension(R.dimen.dataset_card_radius);
@@ -282,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
+        // Automatically open keyboard
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
         input.requestFocus();

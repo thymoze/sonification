@@ -1,6 +1,5 @@
 package mupro.hcm.sonification.fragments;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -28,14 +27,12 @@ import mupro.hcm.sonification.sensors.Sensor;
 public class ChartsFragment extends Fragment {
 
     private static final String TAG = ChartsFragment.class.getName();
-    private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
+    private static final String ARG_DATASET_ID = TAG.concat(".dataset_id");
 
     @BindView(R.id.charts_container)
     LinearLayout charts_container;
     @BindView(R.id.no_charts_text)
     TextView no_charts_text;
-
-    private SharedPreferences sharedPreferences;
 
     private TreeSet<String> mSensors;
     private long mDataSetId;

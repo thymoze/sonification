@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mupro.hcm.sonification.R;

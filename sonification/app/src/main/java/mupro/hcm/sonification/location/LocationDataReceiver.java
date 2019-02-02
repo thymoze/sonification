@@ -7,12 +7,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.List;
-import java.util.function.Function;
 
 import mupro.hcm.sonification.database.AppDatabase;
-import mupro.hcm.sonification.database.DataSet;
 import mupro.hcm.sonification.database.SensorData;
-import mupro.hcm.sonification.sensors.Sensor;
 
 import static mupro.hcm.sonification.MainActivity.EXTRA_SENSORDATA;
 

@@ -2,14 +2,11 @@ package mupro.hcm.sonification.fragments;
 
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -31,10 +28,8 @@ import java.util.List;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import butterknife.BindColor;
-import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.AppDatabase;
 import mupro.hcm.sonification.database.SensorDataDao;
@@ -42,8 +37,8 @@ import mupro.hcm.sonification.sensors.Sensor;
 
 public class ChartCardFragment extends Fragment {
     private static final String TAG = ChartCardFragment.class.getName();
-    private static final String ARG_SENSOR_ID = TAG.concat("sensor_name");
-    private static final String ARG_DATASET_ID = TAG.concat("dataset_id");
+    private static final String ARG_SENSOR_ID = TAG.concat(".sensor_name");
+    private static final String ARG_DATASET_ID = TAG.concat(".dataset_id");
 
     @BindView(R.id.chart)
     LineChart chart;

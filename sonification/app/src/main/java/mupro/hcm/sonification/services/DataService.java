@@ -183,7 +183,7 @@ public class DataService extends Service {
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notification_content))
                 .setOngoing(true)
-                .setSmallIcon(R.drawable.music_note)
+                .setSmallIcon(R.drawable.ic_music_note_black_24dp)
                 .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
 
         return builder.build();

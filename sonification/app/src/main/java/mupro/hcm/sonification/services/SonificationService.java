@@ -6,15 +6,12 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import androidx.annotation.Nullable;
@@ -24,7 +21,6 @@ import mupro.hcm.sonification.database.SensorData;
 import mupro.hcm.sonification.sensors.Sensor;
 import mupro.hcm.sonification.sensors.SensorDataReceiver;
 import mupro.hcm.sonification.sound.Direction;
-import mupro.hcm.sonification.sound.Sound;
 import mupro.hcm.sonification.sound.SoundQueue;
 
 import static mupro.hcm.sonification.MainActivity.ACTION_BROADCAST;

@@ -2,17 +2,13 @@ package mupro.hcm.sonification.dataset;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.preference.PreferenceManager;
-import android.service.autofill.Dataset;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.time.ZoneId;
@@ -29,7 +25,6 @@ import mupro.hcm.sonification.DataActivity;
 import mupro.hcm.sonification.MainActivity;
 import mupro.hcm.sonification.R;
 import mupro.hcm.sonification.database.DataSet;
-import mupro.hcm.sonification.location.LocationDataReceiver;
 
 import static mupro.hcm.sonification.MainActivity.CURRENT_DATASET;
 import static mupro.hcm.sonification.MainActivity.EXTRA_DATASETID;
@@ -41,12 +36,14 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     private static final int TYPE_INACTIVE = 0;
     private static final int TYPE_ACTIVE = 1;
 
-    @BindAnim(R.anim.blink_animation)
+    @BindAnim(R.anim.anim_blink)
     Animation blinkAnimation;
 
     private MainActivity mContext;
     // Cached copy of DataSets
     private List<DataSet> mDataSets;
+
+    // keep track of dataset pending deletion
     private int mPendingIndex;
     private DataSet mPendingDataset;
 
@@ -78,10 +75,12 @@ public class DataSetListAdapter extends RecyclerView.Adapter<DataSetListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         if (mDataSets != null) {
             DataSet current = mDataSets.get(position);
+
             viewHolder.title.setText(current.getName());
             viewHolder.timestamp.setText(current.getTimestamp()
                     .atZone(ZoneId.systemDefault())
                     .format(DateTimeFormatter.ofPattern("dd. MMM YYYY HH:mm")));
+
             double distanceInKm = current.getDistanceInKm();
             if (distanceInKm < 1) {
                 viewHolder.distance.setText(String.format("%.0f m", distanceInKm * 1000));

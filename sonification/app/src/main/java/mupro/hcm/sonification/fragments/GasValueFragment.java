@@ -18,8 +18,8 @@ import mupro.hcm.sonification.sensors.Sensor;
 public class GasValueFragment extends Fragment {
 
     private static final String TAG = MapsBottomSheetFragment.class.getName();
-    private static final String ARG_SENSOR = TAG.concat("sensor");
-    private static final String ARG_VALUE = TAG.concat("value");
+    private static final String ARG_SENSOR = TAG.concat(".sensor");
+    private static final String ARG_VALUE = TAG.concat(".value");
 
     private String mSensorId;
     private double value;

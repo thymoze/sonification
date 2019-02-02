@@ -11,19 +11,19 @@
 
     <Preference
         app:title="@string/title_sounds"
-        android:icon="@drawable/music_note"
+        android:icon="@drawable/ic_music_note_black_24dp"
         app:summary="@string/map_sensor_sound"
         app:fragment="mupro.hcm.sonification.preferences.SoundsPreferencesFragment" />
 
     <Preference
         app:title="@string/app_name"
-        android:icon="@drawable/cellphone_sound"
+        android:icon="@drawable/ic_cellphone_sound_black_24dp"
         app:summary="@string/sonifcation_summary"
         app:fragment="mupro.hcm.sonification.preferences.SonificationPreferencesFragment" />
 
     <Preference
         app:title="@string/title_about"
-        android:icon="@drawable/information"
+        android:icon="@drawable/ic_information_black_24dp"
         app:summary="@string/about_summary"
         app:fragment="mupro.hcm.sonification.preferences.AboutPreferenceFragment" />
 </PreferenceScreen>

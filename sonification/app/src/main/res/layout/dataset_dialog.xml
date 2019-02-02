@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="text"
-            android:textCursorDrawable="@drawable/black_cursor"/>
+            android:textCursorDrawable="@drawable/res_cursor_black"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
