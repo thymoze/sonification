@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Sonification</title>
+<meta name="keywords" content="Sonification" />
+<meta name="description" content="Eine App" />
+<link href="http://fonts.googleapis.com/css?family=Roboto:200,300,400,600,700,900" rel="stylesheet" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link href="style.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="shortcut icon" type="image/x-icon" href="images/sonification.ico">
+
+</head>
+<body>
+<div id="page" class="container">
+	<div id="header">
+		<div id="logo">
+			<img src="images/sonification.png" alt="" />
+			<h1>Sonification</h1>
+		</div>
+		<div id="menu">
+			<ul>
+				<li class="current_page_item"><a href="#" title="Über Sonification"><i class="fas fa-music menu-icon"></i>Sonification</a></li>
+				<li><a href="impressions.html" title="Impressionen"><i class="fas fa-images menu-icon"></i>Impressionen</a></li>
+				<li><a href="downloads.html" title="Download"><i class="fas fa-file-download menu-icon"></i>Downloads</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="main">
+		<div id="gist">
+			<div class="title">
+				<h2>Sonification</h2>
+			</div>
+			<p>Willkommen auf der offiziellen Sonification-Seite!</p>
+		</div>
+		<div id="featured">
+			<div class="section">
+				<div class="title">
+					<h3>Sonifikation</h3>
+					<span class="byline">Was ist das eigentlich?</span>
+				</div>
+				<div class="text left-align">
+					<p>
+						Sonifikation kann auch als "Verklanglichung" übersetzt werden. Im Allgemeinen ist sie die Darstellung von Daten in Klängen und bietet somit neben der graphischen Darstellung eine zuätzliche Form der Datenaufbereitung.
+						Wie auch die Visualisierung hat die Sonifikation wissenschaftliche, didaktische und ästhetisch-künstlerische Anwendungsbereiche.
+					</p>
+					<p>
+						Ziel dieses Projekts ist es, die Sonifikation zur Repräsentation der Luftqualität zu nutzen. 
+						Das soll dem Nutzer genau die Informationen über seine Umwelt vermitteln, die er selbst ohne Hilfsmittel (meist) nicht wahrnehmen kann, und ihm schlussendlich bei einer "gesunden" Routenplanung helfen.
+					</p>
+					<p>
+						Im Zuge dessen wurde die <strong>Sonification</strong>-App im WS2018/19 im Rahmen des Multimedia-Projekts am Lehrstuhl <i>Human Centered Multimedia</i> der Universität Augsburg erstellt.
+						Betreut wurde das Ganze von den Lehrstuhlmitarbeitern Hannes Ritschel und Andreas Seiderer.
+					</p>
+				</div>
+			</div>
+			<div class="section">
+				<div class="title">
+					<h3>Realisierung und Implementierung</h3>
+					<span class="byline">Wie funktioniert das Ganze?</span>
+				</div>
+				<div class="text left-align">
+					<p>
+						Wir bekamen vom Lehrstuhl eine <strong>Sensorbox</strong> bereitgestellt, die u.a. über Sensoren für Feinstaub und verschiedene Gase verfügt.
+						Die ausgelesenen Daten werden von dieser über W-Lan per UDP an das Smartphone gesendet.
+						In der App empfangen wir die Daten, plotten sie und stellen sie auf einer Karte dar.
+						Zeitgleich läuft im Hintergrund der SonificationService, der die relative Veränderung der Gaswerte akustisch repräsentiert.
+						Der Nutzer kann dazu jedem Gas in den Einstellungen ein Instrument zuweisen, das je nachdem in einer auf- oder absteigenden Tonfolge abgespielt wird.
+						Zudem kann er die aktiven Sensoren auswählen, um die bei der Sonifikation und den Diagrammen berücksichtigten Gase einzuschränken.
+					</p>
+				</div>
+			</div>
+			<div class="section last">
+				<div class="title">
+					<h3>Handbuch</h3>
+					<span class="byline">Wie benutze ich es?</span>
+				</div>
+				<div class="text left-align">
+					<p>
+						Nach dem Öffnen der App kann man durch Klicken des "+"-Buttons einen Datensatz hinzufügen.
+						Die App startet daraufhin automatisch die <strong>Sonifikation</strong> und wechselt in die Detailansicht.
+						Hier kann der Nutzer die Gaswerte in Diagrammen live mitverfolgen und sich in der Karte die aufgenommenen Sensordaten anschauen.
+						Durch klicken des Stop-Buttons oben in der Übersicht beendet der Nutzer das Empfangen der Daten.
+						Um sich einen Datensatz erneut anzuschauen kann man in der Übersicht durch klicken dessen vorbefüllte Detailansicht aufrufen.
+					</p>
+					<p>
+						Die <strong>Einstellungen</strong> erreicht man über die drei Punkte oben rechts in der App.
+						Hier kann man die aktiven Sensoren auswählen sowie die Gase auf die verschiedenen Instrumente mappen.
+						Zudem lassen sich hier einige Parameter des SonificationService einstellen, wie z.B. die Art der Sonifikation und die Anzahl der Samples.
+					</p>
+					<p>Wir wünschen viel Spaß bei der Verwendung unserer App!</p>
+				</div>
+			</div>
+		</div>
+		<button onclick="topFunction()" id="topButton" title="Back to top"><i class="fas fa-arrow-circle-up fa-3x"></i></button>
+		<div id="copyright">
+			<span>&copy; Merlin Albes, David Heim, Ralph Stuhler</span>
+			<span>Lehrstuhl Human Centered Multimedia</span>
+			<span>Universität Augsburg</span>
+		</div>
+	</div>
+</div>
+	<script src="script.js"></script>
+</body>
+</html>

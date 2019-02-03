@@ -1,0 +1,353 @@
+	html, body
+	{
+		height: 100%;
+		scroll-behavior: smooth;
+	}
+	
+	body
+	{
+		margin: 0px;
+		padding: 0px;
+		background: #202020;
+		font-family: 'Roboto', sans-serif;
+		font-size: 12pt;
+		font-weight: 300;
+		color: #444444;
+		background-image: url("images/forest.jpg");
+		background-position: bottom;
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: cover;
+	}
+	
+	
+	h1, h2, h3
+	{
+		margin: 0;
+		padding: 0;
+		font-weight: 600;
+		color: #333333;
+	}
+	
+	p, ol, ul
+	{
+		margin-top: 0;
+	}
+	
+	ol, ul
+	{
+		padding: 0;
+		list-style: none;
+	}
+	
+	p
+	{
+		line-height: 180%;
+	}
+	
+	.container
+	{
+		overflow: hidden;
+		margin: 0em auto;
+		width: 1500px;
+	}
+	
+/*********************************************************************************/
+/* Heading Titles                                                                */
+/*********************************************************************************/
+
+	.title
+	{
+		margin-bottom: 3em;
+	}
+	
+	.title h2
+	{
+		font-size: 2.8em;
+	}
+	
+	.title .byline
+	{
+		font-size: 1.2em;
+		color: #6F6F6F;
+	}
+		
+/*********************************************************************************/
+/* Header                                                                        */
+/*********************************************************************************/
+
+	#header
+	{
+		position: relative;
+		float: left;
+		width: 300px;
+		padding: 3em 0em;
+	}
+
+/*********************************************************************************/
+/* Logo                                                                          */
+/*********************************************************************************/
+
+	#logo
+	{
+		text-align: center;
+		margin-bottom: 4em;
+	}
+	
+	#logo h1
+	{
+		display: block;
+		color: white;
+	}
+	
+	#logo a
+	{
+		text-decoration: none;
+		color: #FFF;
+	}
+	
+	#logo span
+	{
+		padding-right: 0.5em;
+		text-transform: uppercase;
+		font-size: 0.90em;
+		color: rgba(255,255,255,0.3);
+	}
+
+	#logo span a
+	{
+		color: rgba(255,255,255,0.5);
+	}
+	
+	#logo img
+	{
+		display: inline-block;
+		margin-bottom: 1em;
+		border-radius: 50%;
+	}
+
+/*********************************************************************************/
+/* Menu                                                                          */
+/*********************************************************************************/
+
+	#menu
+	{
+	}
+	
+	#menu ul
+	{
+	}
+	
+	#menu li
+	{
+		border-top: 1px solid rgba(255,255,255,0.08);
+	}
+
+	#menu ul li:first-child
+	{
+		border-top: none;
+	}
+	
+	#menu li a, #menu li span
+	{
+		display: block;
+		padding: 2em 1.5em;
+		text-align: center;
+		text-decoration:  none;
+		text-transform: uppercase;
+		font-weight: 700;
+		color: rgba(255,255,255,0.5);
+	}
+	
+	#menu li:hover a, #menu li.active a, #menu li.active span
+	{
+		color: white;
+	}
+	
+	#menu .current_page_item a
+	{
+		background: rgb(47, 140, 252, 0.7);
+		color: rgba(255,255,255,1);
+	}
+
+/*********************************************************************************/
+/* Page                                                                          */
+/*********************************************************************************/
+
+	#page
+	{
+		background: rgba(0, 0, 0, 0.6);
+		margin: 2em auto;
+	}
+
+/*********************************************************************************/
+/* Main                                                                          */
+/*********************************************************************************/
+
+	#main
+	{
+		position: relative;
+		overflow: hidden;
+		float: right;
+		width: 1100px;
+		padding: 3em 50px 10em 50px;
+		background: #FFF;
+		/*border-top: 6px solid #2980b9;*/
+		text-align: center;
+		min-height: 800px;
+	}
+
+/*********************************************************************************/
+/* Featured                                                                      */
+/*********************************************************************************/
+
+	#featured
+	{
+		overflow: hidden;
+		margin-bottom: 3em;
+		padding-top: 2em;
+		border-top: 1px solid rgba(0,0,0,0.08);
+	}
+
+/*********************************************************************************/
+/* Copyright                                                                     */
+/*********************************************************************************/
+
+	#copyright
+	{
+		overflow: hidden;
+		padding: 2em 0 0 0;
+		border-top: 1px solid rgba(0,0,0,0.08);
+		position: absolute;
+		bottom: 0;
+		width: 1100px;
+		padding-bottom: 2em;
+	}
+	
+	#copyright span
+	{
+		display: block;
+		letter-spacing: 0.20em;
+		line-height: 2.5em;
+		text-align: center;
+		text-transform: uppercase;
+		font-size: 0.80em;
+		color: rgba(0,0,0,0.7);
+	}
+
+/*********************************************************************************/
+/* Custom Stuff                                                                  */
+/*********************************************************************************/
+
+	#page {
+		box-shadow: 0.2em 0.2em 1em rgba(50, 50, 50, 0.7);
+	}
+
+	#gist {
+		margin-bottom: 2em;
+	}
+
+	#main h3 {
+		margin-bottom: 0.2em;
+		font-size: 24pt;
+	}
+
+	#main .title {
+		margin-bottom: 2em;
+	}
+
+
+	#main .text p {
+		margin-bottom: 0.4em;
+	}
+
+	#main .section {
+		margin-bottom: 4em;
+	}
+
+	#main .section.last {
+		margin-bottom: 0;
+	}
+
+	.wrapper {
+		width: 100%;
+		margin-bottom: 5em;
+		padding-bottom: 5em;
+		border-bottom: 1px solid rgba(0,0,0,.1); 
+	}
+
+	.wrapper.last {
+		border: none;
+		padding-bottom: 0;
+	}
+
+	.showcase {
+		width: 49%;
+		display: inline-block;
+	}
+
+	.showcase.full-width {
+		width: 100%;
+	}
+
+	.showcase h3 {
+		margin-top: 1em;
+		margin-bottom: 0.3em;
+	}
+
+	.showcase .screenshot {
+		height: 500px;
+		border-top: 2em solid black;
+		border-right: 0.7em solid black;
+		border-bottom: 2em solid black;
+		border-left: 0.7em solid black;
+		border-radius: 1.2em;
+	}
+
+	.left-align {
+		text-align: left;
+	}
+
+	.download-list {
+	}
+
+	.download-list li {
+		margin: 1em;
+	}
+
+	a {
+		color: #2980b9;
+	}
+
+	a:hover {
+		font-weight: bold;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	#menu .menu-icon
+	{
+		margin-right: 1em;
+	}
+
+	.sticky {
+		position: fixed !important;
+		top: 0;
+	}
+	  
+	.sticky + .content {
+		padding-top: 5em;
+	}
+
+	#topButton {
+		display: none; /* Hidden by default */
+		position: fixed; /* Fixed/sticky position */
+		color: white;
+		bottom: 4em; /* Place the button at the bottom of the page */
+		right: 4em; /* Place the button 30px from the right */
+		z-index: 99; /* Make sure it does not overlap */
+		border: none; /* Remove borders */
+		outline: none; /* Remove outline */
+		background: transparent;
+		cursor: pointer;
+	}
