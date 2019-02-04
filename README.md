@@ -18,3 +18,9 @@ Merlin Albes, David Heim, Ralph Stuhler
 ## Betreuer
 
 Hannes Ritschel, Andreas Seiderer
+
+## Dependencies
+
+com.github.PhilJay:MPAndroidChart
+com.karumi:dexter
+com.jakewharton:butterknife
