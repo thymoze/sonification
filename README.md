@@ -1,7 +1,7 @@
 ![Logo](sonification/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png)
 # Sonification
 
-Multimediaprojekt Uni Augsburg WS 2018/19.
+Multimediaprojekt Uni Augsburg WS 2018/19, Lehrstuhl Human Centered Multimedia.
 
 ## Download
 
@@ -14,3 +14,7 @@ Multimediaprojekt Uni Augsburg WS 2018/19.
 ## Team
 
 Merlin Albes, David Heim, Ralph Stuhler
+
+## Betreuer
+
+Hannes Ritschel, Andreas Seiderer
