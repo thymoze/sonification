@@ -21,6 +21,6 @@ Hannes Ritschel, Andreas Seiderer
 
 ## Dependencies
 
-com.github.PhilJay:MPAndroidChart
-com.karumi:dexter
-com.jakewharton:butterknife
+* com.github.PhilJay:MPAndroidChart
+* com.karumi:dexter
+* com.jakewharton:butterknife
